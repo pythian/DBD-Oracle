@@ -82,15 +82,6 @@ Create a symlink from F<libclntsh.dylib.10.1> to F<libclntsh.dylib>:
 
 =item *
 
-The following directory is hardcoded into the Oracle Instant Client - god
-knows why - so we need to create and symlink it:
-
-  sudo mkdir -p /b/227/rdbms/
-  sudo cd /b/227/rdbms/
-  sudo ln -s /usr/oracle_instantclient/ lib
-
-=item *
-
 Update your environment to point to the libraries:
 
   export ORACLE_HOME=/usr/oracle_instantclient
