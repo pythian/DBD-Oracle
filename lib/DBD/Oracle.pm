@@ -18,6 +18,9 @@ package DBD::Oracle;
     use Exporter ();
     use DBD::Oracle::Object();
 
+    # for dev version
+    $DBD::Oracle::VERSION ||= '1.00';
+
     @ISA = qw(DynaLoader Exporter);
     %EXPORT_TAGS = (
       ora_types => [ qw(
@@ -44,7 +47,7 @@ package DBD::Oracle;
 
     require_version DBI 1.51;
 
-    bootstrap DBD::Oracle $VERSION;
+    DBD::Oracle->bootstrap($DBD::Oracle::VERSION);
 
     $drh = undef;	# holds driver handle once initialized
 
