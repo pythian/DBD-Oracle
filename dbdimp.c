@@ -933,8 +933,12 @@ int dbd_st_bind_col(SV *sth, imp_sth_t *imp_sth, SV *col, SV *ref, IV type, SV *
 		croak("cannot bind to non-existent field %d", field);
 	}
 
-	imp_sth->fbh[field-1].req_type = type;
-	imp_sth->fbh[field-1].bind_flags = 0; /* default to none */
+    if (type != 0) {
+        imp_sth->fbh[field-1].req_type = type;
+    }
+    if (attribs) {
+        imp_sth->fbh[field-1].bind_flags = 0; /* default to none */
+    }
 
 #if DBIXS_REVISION >= 13590
 	/* DBIXS 13590 added StrictlyTyped and DiscardString attributes */
