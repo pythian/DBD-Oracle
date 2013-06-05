@@ -90,4 +90,5 @@ t/lib/ExecuteArray.pm
 t/nchar_test_lib.pl
 t/rt13865.t
 t/rt74753-utf8-encoded.t
+t/rt85886.t
 typemap
