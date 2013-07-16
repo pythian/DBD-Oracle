@@ -91,7 +91,7 @@ running I<$ORACLE_HOME/lib/genclntsh.sh> and it should create it.
 
 Never copy I<libclntsh.so> to a different machine or Oracle version.
 If DBD::Oracle was built on a machine with a different path to I<libclntsh.so>
-then you'll need to set set an environment variable, typically
+then you'll need to set an environment variable, typically
 I<LD_LIBRARY_PATH>, to include the directory containing I<libclntsh.so>.
 
 I<LD_LIBRARY_PATH> is typically ignored if the script is running set-uid
