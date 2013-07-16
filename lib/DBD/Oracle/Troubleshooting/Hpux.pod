@@ -42,7 +42,7 @@ scope of this document, some information can be found in the section
 L<Compiling on a Client Machine>, or see your friendly Oracle DBA.
 
 One final remark, 3 years after this was first written.  This has been
-updated numberous times over the years.  And some of the new biuld
+updated numerous times over the years.  And some of the new build
 recipe's see simpler than some of the original instructions in this file.
 
 I think one reason the recipe is getting simpler may be that the build
@@ -116,7 +116,7 @@ is preferred on PA-RISC, and when an incantation can be concocted that
 eliminates the noisy warnings the produces at link time, this will
 probably become the default.  Older 64bit versions of GCC, are known to
 be unable to build a good LP64 perl. And these flags will cause gcc to
-barf. On HP-UX 11i (11.11), gcc-3.4.4 or gcc-3.4.5 is prefered over
+barf. On HP-UX 11i (11.11), gcc-3.4.4 or gcc-3.4.5 is preferred over
 gcc-4.0.2 (or older gcc-4 versions) as 64bit builds on PA-RISC with that
 versions of the compiler are unreliable.
 
@@ -229,7 +229,7 @@ When asked:
     For example:
     Any additional cc flags? [-D_HP-UX_SOURCE -Aa] -Ae +Z -z
 
-Though this should be the default inmore recent perl versions.
+Though this should be the default in more recent perl versions.
 
 Lastly, and this is optional, when asked:
 
@@ -806,7 +806,7 @@ Then unpack and build:
 
 Note from H.Merijn Brand: In more recent perl distributions using
 HP C-ANSI-C should "just work" (TM), provided your C compiler can be
-found and used, your database is up and running, and your enviroment
+found and used, your database is up and running, and your environment
 variables are set as noted. Example is for a 64bit build, as Oracle
 ships Oracle 9 and up for HP-UX only in 64bit builds.
 
@@ -875,7 +875,7 @@ statements, etc.:
 
 The appl_setup sets some Oracle variables (specific to our installation),
 which I then override for the database that I am working on.  The script
-(which I source) also unse some variables specific to other applications
+(which I source) also uses some variables specific to other applications
 (e.g., Tivoli), mostly to unclutter my debugging.  The INSTALL variable
 is related to building libgdbm.
 
@@ -888,7 +888,7 @@ and DBD-Oracle-1.14 on HPUX 11.0 ( an L2000 machine ) with Oracle 9.0.1
 
 =head2 http://www.sas.com/service/techsup/unotes/SN/001/001875.html
 
-This is a not from from the SAS support people documenting the
+This is a note from the SAS support people documenting the
 LhtStrInsert() and LhtStrCreate() undefined symbols errors, and how to
 fix them in the Oracle makefiles.
 
@@ -916,7 +916,7 @@ or updates  a module.
 =item 3 It eliminates Dynaloader warning (multiply defined).
 
 This occurs with the static build when Perl is run with -w.  I fixed
-this by removing -w from my #! lines, converting the the pragam "use
+this by removing -w from my #! lines, converting the pragam "use
 warnings;". However, it was annoying, since all my scripts had -w in the
 #! line.
 
