@@ -33,9 +33,9 @@ to a central process specific mechanism.
 But as it is inserted at the very top of LNM$FILE_DEV it also
 represents a source of misfortune - especially if a user with
 enough privilege to update the oracle table does so (presumably
-unintentionally), as an examble by changing NLS_LANG.
+unintentionally), as an example by changing NLS_LANG.
 
-PERL has the abillity to define, redefine and undefine (deassign)
+PERL has the ability to define, redefine and undefine (deassign)
 logical names, but if not told otherwise by the user does it
 in the first table in above list, and not as one would normally
 expect in the process table.
