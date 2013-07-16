@@ -148,7 +148,7 @@ perl v5.8.8 built for i486-linux-gnu-thread-multi
 Oracle Instant client (10.1.0.5)
 
 The problem is in Makefile.PL. In line 130 the function find_oracle_home
-is used to guess a value form $ORACLE_HOME if it is not set explicitely.
+is used to guess a value form $ORACLE_HOME if it is not set explicitly.
 This value is used in line 138 to setup the environment (regardless
 which client is used).
 
