@@ -15,7 +15,7 @@ Nothing special with this you just have to set up you permissions as follows;
 
 =head1 undefined symbol: __cmpdi2 comes up when Oracle isn't properly linked to the libgcc.a library.
 
-In version 8, this was correctd by changing the SYSLIBS entry in
+In version 8, this was corrected by changing the SYSLIBS entry in
 $ORACLE_HOME/bin/genclntsh to include
 "-L/usr/lib/gcc-lib/i386-redhat-linux/3.2 -lgcc".
 
@@ -31,7 +31,7 @@ the linkage with DBD::Oracle proceeds properly.
 
 =head1 cc1: invalid option `tune=pentium4'" error
 
-If you get the above it seems that eiter your Perl or OS where compiled with a different version of GCC or the GCC that is on your system is very old.
+If you get the above it seems that either your Perl or OS where compiled with a different version of GCC or the GCC that is on your system is very old.
 
 No real problem with the above however you will have to
 
@@ -91,7 +91,7 @@ DBD::Oracle seems to hit some sort of bug with the above two versions of DB.
 The bug seems to hit when you when the Oracle database charset: US7ASCII and the Oracle nchar charset: AL16UTF16 and it has also
 been reported when the Oracle database charset: WE8ISO8850P1 Oracle nchar charset: AL32UTF16.  
 
-So far there is no patch for this but here are some work arounds 
+So far there is no patch for this but here are some workarounds 
 
     use DBD::Oracle qw( SQLCS_IMPLICIT SQLCS_NCHAR );
     ...
