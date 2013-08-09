@@ -3,12 +3,18 @@ Revision history for DBD::Oracle
 {{$NEXT}}
   - promote 1.63_00 to stable.
 
+  [BUG FIXES]
+
+  - Fix RT85886. The TYPE passed to bind_col is supposed to be sticky
+  and it wasn't. Attributes passed to bind_col could be lost later if
+  bind_col is called again without attributes. Both of these occur
+  when fetchall_arrayref is called with a slice (Martin J. Evans).
 
 1.63_00   2013-05-03
 
   [ENHANCEMENTS]
   - DBD-Oracle: Use of uninitialized value $user_only in uc [RT#84657]
-    (Steffen Goeldner)  
+    (Steffen Goeldner)
 
   [BUG FIXES]
   - Make 50cursor.t Oracle8-friendly. (RT#84660, patch by Steffen Goeldner)
@@ -25,7 +31,7 @@ Revision history for DBD::Oracle
 1.61_00   2013-04-15
 
   [BUG FIXES]
-  - Adjust the privs needed for the DROP/CREATE table test. [GH#35] 
+  - Adjust the privs needed for the DROP/CREATE table test. [GH#35]
     (Joe Crotty)
 
   - Fixed RT84170 - when using scrollable cursors and you've done a
