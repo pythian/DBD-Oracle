@@ -464,7 +464,7 @@ SQL
 SELECT *
   FROM
 (
-  SELECT /*+ RULE*/
+  SELECT /*+ CHOOSE */
        NULL         TABLE_CAT
      , t.OWNER      TABLE_SCHEM
      , t.TABLE_NAME TABLE_NAME
@@ -518,7 +518,7 @@ SQL
 SELECT *
   FROM
 (
-  SELECT /*+ RULE*/
+  SELECT /*+ CHOOSE */
          NULL              TABLE_CAT
        , c.OWNER           TABLE_SCHEM
        , c.TABLE_NAME      TABLE_NAME
@@ -551,7 +551,7 @@ SQL
 SELECT *
   FROM
 (
-  SELECT /*+ RULE*/
+  SELECT /*+ CHOOSE */
          to_char( NULL )    UK_TABLE_CAT
        , uk.OWNER           UK_TABLE_SCHEM
        , uk.TABLE_NAME      UK_TABLE_NAME
@@ -620,7 +620,7 @@ SQL
 SELECT *
   FROM
 (
-  SELECT /*+ RULE*/
+  SELECT /*+ CHOOSE */
          to_char( NULL )     TABLE_CAT
        , tc.OWNER            TABLE_SCHEM
        , tc.TABLE_NAME       TABLE_NAME
@@ -776,6 +776,62 @@ SQL
 
 	$sth->execute( @BindVals ) or return undef;
 	$sth;
+    }
+
+    sub statistics_info {
+        my($dbh, $catalog, $schema, $table, $unique_only, $quick) = @_;
+        if (ref $catalog eq 'HASH') {
+            ($schema, $table) = @$catalog{'TABLE_SCHEM','TABLE_NAME'};
+            $catalog = undef;
+        }
+        my $SQL = <<'SQL';
+SELECT *
+  FROM
+(
+  SELECT /*+ CHOOSE */
+         NULL              TABLE_CAT
+       , t.OWNER           TABLE_SCHEM
+       , t.TABLE_NAME      TABLE_NAME
+       , to_number( NULL ) NON_UNIQUE
+       , NULL              INDEX_QUALIFIER
+       , NULL              INDEX_NAME
+       ,'table'            TYPE
+       , to_number( NULL ) ORDINAL_POSITION
+       , NULL              COLUMN_NAME
+       , NULL              ASC_OR_DESC
+       , t.NUM_ROWS        CARDINALITY
+       , t.BLOCKS          PAGES
+       , NULL              FILTER_CONDITION
+    FROM ALL_TABLES        t
+   UNION
+  SELECT NULL              TABLE_CAT
+       , t.OWNER           TABLE_SCHEM
+       , t.TABLE_NAME      TABLE_NAME
+       , decode( t.UNIQUENESS,'UNIQUE', 0, 1 ) NON_UNIQUE
+       , c.INDEX_OWNER     INDEX_QUALIFIER
+       , c.INDEX_NAME      INDEX_NAME
+       , decode( t.INDEX_TYPE,'NORMAL','btree','CLUSTER','clustered','other') TYPE
+       , c.COLUMN_POSITION ORDINAL_POSITION
+       , c.COLUMN_NAME     COLUMN_NAME
+       , decode( c.DESCEND,'ASC','A','DESC','D') ASC_OR_DESC
+       , t.DISTINCT_KEYS   CARDINALITY
+       , t.LEAF_BLOCKS     PAGES
+       , NULL              FILTER_CONDITION
+    FROM ALL_INDEXES       t
+       , ALL_IND_COLUMNS   c
+   WHERE t.OWNER           = c.INDEX_OWNER
+     AND t.INDEX_NAME      = c.INDEX_NAME
+     AND t.TABLE_OWNER     = c.TABLE_OWNER
+     AND t.TABLE_NAME      = c.TABLE_NAME
+     AND t.UNIQUENESS   LIKE :3
+)
+ WHERE TABLE_SCHEM = :1
+   AND TABLE_NAME  = :2
+ ORDER BY NON_UNIQUE, TYPE, INDEX_QUALIFIER, INDEX_NAME, ORDINAL_POSITION
+SQL
+        my $sth = $dbh->prepare($SQL) or return undef;
+        $sth->execute($schema, $table, $unique_only ?'UNIQUE':'%') or return undef;
+        $sth;
     }
 
     sub type_info_all {
@@ -2562,6 +2618,40 @@ So in the example the exact case "Bla_BLA" must be used to get it info on the co
  alter table bloggind add (Bla_BLA NUMBER)
 
 any case can be used to get info on the column.
+
+=head2 B<statistics_info()>
+
+Oracle does not support catalogues so TABLE_CAT is ignored as
+selection criterion.
+The TABLE_CAT field of a fetched row is always NULL (undef).
+See L</table_info()> for more detailed information.
+
+The INDEX_QUALIFIER field of a fetched row is always NULL (undef),
+for the same reason as for TABLE_CAT.
+
+If an index was created without an identifier
+(e.g. in the course of a PK creation),
+INDEX_NAME contains a system generated name with the form SYS_.
+
+COLUMN_NAME may contain a system generated name
+(e.g. for function-based indexes).
+
+For the TYPE column, a simple mapping is used:
+
+  NORMAL   btree
+  CLUSTER  clustered
+  ...      other
+
+The C<$quick> parameter is currently ignored.
+The method uses the dictionary with the gathered statistics,
+thus cannot ensure that the values for CARDINALITY and PAGES are current.
+
+The result set is ordered by
+NON_UNIQUE, TYPE, INDEX_QUALIFIER, INDEX_NAME, ORDINAL_POSITION.
+
+An identifier is passed I<as is>, i.e. as the user provides or
+Oracle returns it.
+See L</table_info()> for more detailed information.
 
 =head2 B<selectrow_array>
 
