@@ -3,6 +3,12 @@ Revision history for DBD::Oracle
 {{$NEXT}}
   - promote 1.67_00 to stable.
 
+  [BUG FIXES]
+
+  - Fix RT91698. If you bound an output parameter to a scalar and
+    repeatedly called execute the memory allocated in your bound
+    scalar could increase each time. (Martin J. Evans)
+
 1.67_00   2013-11-05
 
   [BUG FIXES]
@@ -11,7 +17,7 @@ Revision history for DBD::Oracle
 
   [DOCUMENTATION]
   - POD typos (RT#88285, RT#88284, Gregor Herrman).
-  - Grooming of Hpux troubleshooting pod (GH#7, Martin J. Evans, 
+  - Grooming of Hpux troubleshooting pod (GH#7, Martin J. Evans,
     Yanick Champoux)
 
 1.66      2013-08-23

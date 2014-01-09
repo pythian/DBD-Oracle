@@ -2549,19 +2549,26 @@ dbd_rebind_ph_char(imp_sth_t *imp_sth, phs_t *phs)
 		if (imp_sth->ora_pad_empty)
 			croak("Can't use ora_pad_empty with bind_param_inout");
 		if (SvTYPE(phs->sv)!=SVt_RV || !at_exec) {
-
 			if (phs->ftype == 96){
-				SvGROW(phs->sv,(STRLEN) (unsigned int)phs->maxlen-1);
+                SvGROW(phs->sv,(STRLEN) (unsigned int)phs->maxlen-1);
+                if (DBIc_DBISTATE(imp_sth)->debug >= 6 || dbd_verbose >= 6) {
+                    PerlIO_printf(DBIc_LOGPIO(imp_sth),
+                                  "Growing 96 phs sv to %ld resulted in buffer %ld\n", phs->maxlen - 1, SvLEN(phs->sv));
+                }
 			} else {
 				STRLEN min_len = 28;
 				(void)SvUPGRADE(phs->sv, SVt_PVNV);
-			/* ensure room for result, 28 is magic number (see sv_2pv)	*/
-			/* don't apply 28 char min to CHAR types - probably shouldn't	*/
-			/* apply it anywhere really, trying to be too helpful.		*/
-			/* phs->sv _is_ the real live variable, it may 'mutate' later	*/
-			/* pre-upgrade to high'ish type to reduce risk of SvPVX realloc/move */
-				SvGROW(phs->sv, (STRLEN)(((unsigned int) phs->maxlen <= min_len) ? min_len : (unsigned int) phs->maxlen)+1/*for null*/);
-
+                /* ensure room for result, 28 is magic number (see sv_2pv)	*/
+                /* don't apply 28 char min to CHAR types - probably shouldn't	*/
+                /* apply it anywhere really, trying to be too helpful.		*/
+                /* phs->sv _is_ the real live variable, it may 'mutate' later	*/
+                /* pre-upgrade to high'ish type to reduce risk of SvPVX realloc/move */
+                /* NOTE SvGROW resets SvOOK_offset and we want to do this */
+                SvGROW(phs->sv, (STRLEN)(((unsigned int) phs->maxlen <= min_len) ? min_len : (unsigned int) phs->maxlen));
+                if (DBIc_DBISTATE(imp_sth)->debug >= 6 || dbd_verbose >= 6) {
+                    PerlIO_printf(DBIc_LOGPIO(imp_sth),
+                                  "Growing phs sv to %ld resulted in buffer %ld\n", phs->maxlen +1, SvLEN(phs->sv));
+                }
 			}
 		}
 
@@ -2591,7 +2598,11 @@ dbd_rebind_ph_char(imp_sth_t *imp_sth, phs_t *phs)
 		phs->maxlen  = 4000; /* Just make is a varchar max should be ok for most things*/
 
 	} else {
-		phs->maxlen  = ((IV)SvLEN(phs->sv)); /* avail buffer space (64bit safe) Logicaly maxlen should never change but it does why I know not*/
+        if (DBIc_DBISTATE(imp_sth)->debug >= 6|| dbd_verbose >= 6 ) {
+            PerlIO_printf(DBIc_LOGPIO(imp_sth),
+                          "Changing maxlen to %ld\n", SvLEN(phs->sv));
+        }
+		phs->maxlen  = ((IV)SvLEN(phs->sv)); /* avail buffer space (64bit safe) Logicaly maxlen should never change but it does why I know not - MJE because SvGROW can allocate more than you ask for - anyway - I fixed that and it doesn't grow anymore */
 
 	}
 
@@ -3265,11 +3276,16 @@ dbd_bind_ph(SV *sth, imp_sth_t *imp_sth, SV *ph_namesv, SV *newvalue, IV sql_typ
 		sv_setsv(phs->sv, newvalue);
 		if (SvAMAGIC(phs->sv)) /* overloaded. XXX hack, logic ought to be pushed deeper */
 			sv_pvn_force(phs->sv, &PL_na);
-	} else if (newvalue != phs->sv) {
-		if (phs->sv)
-			SvREFCNT_dec(phs->sv);
+	} else {
+        if (newvalue != phs->sv) {
+            if (phs->sv)
+                SvREFCNT_dec(phs->sv);
 
- 		phs->sv = SvREFCNT_inc(newvalue);	/* point to live var	*/
+            phs->sv = SvREFCNT_inc(newvalue);	/* point to live var	*/
+        }
+        /* Add space for NUL - do it now rather than in rebind as it cause problems
+           in rebind where maxlen continually grows. */
+        phs->maxlen = phs->maxlen + 1;
 	}
 
 	return dbd_rebind_ph(sth, imp_sth, phs);

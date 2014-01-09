@@ -1226,7 +1226,7 @@ dbd_phs_out(dvoid *octxp, OCIBind *bindp,
 				sv_setpv(sv,"");
 		}
 
-		*bufpp = SvGROW(sv, (size_t)(((phs->maxlen < 28) ? 28 : phs->maxlen)+1)/*for null*/);
+        *bufpp = SvGROW(sv, (size_t)(((phs->maxlen < 28) ? 28 : phs->maxlen)));
 		phs->alen = SvLEN(sv);	/* max buffer size now, actual data len later */
 
 	}
