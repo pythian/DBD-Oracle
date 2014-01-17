@@ -4341,10 +4341,20 @@ dbd_st_FETCH_attrib(SV *sth, imp_sth_t *imp_sth, SV *keysv)
 
 	if (kl==4 && strEQ(key, "NAME")) {
 		AV *av = newAV();
-		retsv = newRV(sv_2mortal((SV*)av));
-		while(--i >= 0)
-			av_store(av, i, newSVpv((char*)imp_sth->fbh[i].name,0));
+        SV *x;
 
+		retsv = newRV(sv_2mortal((SV*)av));
+		while(--i >= 0) {
+            x = newSVpv((char*)imp_sth->fbh[i].name,0);
+            if (CSFORM_IMPLIES_UTF8(SQLCS_IMPLICIT)) {
+#ifdef sv_utf8_decode
+                sv_utf8_decode(x);
+#else
+                SvUTF8_on(x);
+#endif
+            }
+			av_store(av, i, x);
+        }
 	}
 	else if (kl==11 && strEQ(key, "ParamValues")) {
 		HV *pvhv = newHV();

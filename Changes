@@ -1,5 +1,13 @@
 Revision history for DBD::Oracle
 
+NEXT
+
+  [BUG FIXES]
+
+  - Fix RT92134. When using fetch*_hashref the values are decoded but
+    not the keys so if you have unicode column names they were not
+    returned correctly.  (Martin J. Evans)
+
 1.69_01 2014-01-14
 
   [BUG FIXES]

@@ -13,3 +13,5 @@ mk.pm
 oci8.o
 DBD-Oracle*
 project.vim
+mje/*
+*#
