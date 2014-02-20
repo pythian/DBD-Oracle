@@ -604,27 +604,30 @@ SQL
 
 
     sub column_info {
-	my $dbh  = shift;
-	my $attr = ( ref $_[0] eq 'HASH') ? $_[0] : {
-	    'TABLE_SCHEM' => $_[1],'TABLE_NAME' => $_[2],'COLUMN_NAME' => $_[3] };
-	my $ora_server_version = ora_server_version($dbh);
-	my($typecase,$typecaseend) = ('','');
-	if ($ora_server_version->[0] >= 8) {
-	    $typecase = <<'SQL';
+        my $dbh  = shift;
+        my $attr = ( ref $_[0] eq 'HASH') ? $_[0] : {
+            'TABLE_SCHEM' => $_[1],'TABLE_NAME' => $_[2],'COLUMN_NAME' => $_[3] };
+        my $ora_server_version = ora_server_version($dbh);
+        my($typecase,$typecaseend, $choose) = ('','','/*+ CHOOSE */');
+        if ($ora_server_version->[0] >= 8) {
+            $typecase = <<'SQL';
 CASE WHEN tc.DATA_TYPE LIKE 'TIMESTAMP% WITH% TIME ZONE' THEN 95
      WHEN tc.DATA_TYPE LIKE 'TIMESTAMP%'                 THEN 93
      WHEN tc.DATA_TYPE LIKE 'INTERVAL DAY% TO SECOND%'   THEN 110
      WHEN tc.DATA_TYPE LIKE 'INTERVAL YEAR% TO MONTH'    THEN 107
 ELSE
 SQL
-	    $typecaseend = 'END';
-	}
-  my $char_length = $ora_server_version->[0] < 9 ? 'DATA_LENGTH':'CHAR_LENGTH';
-	my $SQL = <<"SQL";
+            $typecaseend = 'END';
+        } elsif ($ora_server_version->[0] >= 11) {
+            # rt91217 CHOOSE hint deprecated
+            $choose = '';
+        }
+        my $char_length = $ora_server_version->[0] < 9 ? 'DATA_LENGTH':'CHAR_LENGTH';
+        my $SQL = <<"SQL";
 SELECT *
   FROM
 (
-  SELECT /*+ CHOOSE */
+  SELECT $choose
          to_char( NULL )     TABLE_CAT
        , tc.OWNER            TABLE_SCHEM
        , tc.TABLE_NAME       TABLE_NAME
@@ -738,14 +741,14 @@ SELECT *
 )
  WHERE 1              = 1
 SQL
-	my @BindVals = ();
-	while ( my ( $k, $v ) = each %$attr ) {
-	    if ( $v ) {
-		$SQL .= "   AND $k LIKE ? ESCAPE '\\'\n";
-		push @BindVals, $v;
-	    }
-	}
-	$SQL .= " ORDER BY TABLE_SCHEM, TABLE_NAME, ORDINAL_POSITION\n";
+        my @BindVals = ();
+        while ( my ( $k, $v ) = each %$attr ) {
+            if ( $v ) {
+                $SQL .= "   AND $k LIKE ? ESCAPE '\\'\n";
+                push @BindVals, $v;
+            }
+        }
+        $SQL .= " ORDER BY TABLE_SCHEM, TABLE_NAME, ORDINAL_POSITION\n";
 
 
         # Since DATA_DEFAULT is a LONG, DEFAULT values longer than 80 chars will
@@ -778,8 +781,8 @@ SQL
 
         return undef if not $sth;
 
-	$sth->execute( @BindVals ) or return undef;
-	$sth;
+        $sth->execute( @BindVals ) or return undef;
+        $sth;
     }
 
     sub statistics_info {
@@ -788,11 +791,17 @@ SQL
             ($schema, $table) = @$catalog{'TABLE_SCHEM','TABLE_NAME'};
             $catalog = undef;
         }
-        my $SQL = <<'SQL';
+        my $choose = '/*+ CHOOSE */';
+        my $ora_server_version = ora_server_version($dbh);
+        if ($ora_server_version->[0] >= 11) {
+            # rt91217 CHOOSE hint deprecated
+            $choose = '';
+        }
+        my $SQL = <<"SQL";
 SELECT *
   FROM
 (
-  SELECT /*+ CHOOSE */
+  SELECT $choose
          NULL              TABLE_CAT
        , t.OWNER           TABLE_SCHEM
        , t.TABLE_NAME      TABLE_NAME
@@ -1625,7 +1634,7 @@ to sleep between retries simple add a sleep to your callback sub.
 
 The ora_session_mode attribute can be used to connect with SYSDBA,
 SYSOPER, ORA_SYSASM, ORA_SYSBACKUP, ORA_SYSKM and ORA_SYSDG authorization.
-The ORA_SYSDBA, ORA_SYSOPER, ORA_SYSASM, ORA_SYSBACKUP, ORA_SYSKM 
+The ORA_SYSDBA, ORA_SYSOPER, ORA_SYSASM, ORA_SYSBACKUP, ORA_SYSKM
 and ORA_SYSDG constants can be imported using
 
   use DBD::Oracle qw(:ora_session_modes);
