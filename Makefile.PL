@@ -32,9 +32,7 @@ BEGIN {
         use VMS::Filespec;
         1;
     } or die $@;
-
 }
-
 
 my $dbi_arch_dir = dbd_dbi_arch_dir();
 my $so = $Config{so}; # typically 'so', 'dylib' on Darwin/OSX
@@ -1968,6 +1966,10 @@ sub check_ldlibpthname {
 
     return 1 if grep { s:[\\/]$::; $_ eq $libdir } @dirs;
 
+    # It is also ok if we are using symbolic links
+    return 1 if grep { s:[\\/]$::; $_ eq $libdir }
+        map { Cwd::abs_path ($_) } @dirs;
+
     # on solaris, it can be under LD_LIBRARY_PATH_(32|64)
     if ( $^O eq 'solaris' ) {
         my $ld_library_path_name = 'LD_LIBRARY_PATH_' 
@@ -1980,7 +1982,7 @@ sub check_ldlibpthname {
 
         s#[\\/]$## for @dirs;  # cut potential final / or \
 
-        return if grep { $_ eq $libdir } @dirs;
+        return 1 if grep { $_ eq $libdir } @dirs;
     }
 
     warn "WARNING: Your $warn_name env var doesn't include '$libdir' but probably needs to.\n";
