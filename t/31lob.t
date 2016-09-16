@@ -212,6 +212,8 @@ END_SQL
     }
 }
 
+undef $sth;
+
 $dbh->do("DROP TABLE $table");
 $dbh->disconnect;
 
