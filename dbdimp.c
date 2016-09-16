@@ -98,7 +98,7 @@ oci_error_get(imp_xxh_t *imp_xxh,
                           what ? what : "<NULL>", (long)recno,
                           (eg_status==OCI_SUCCESS) ? "ok" : oci_status_name(eg_status),
                           status, (long)eg_errcode, errbuf);
-			errcode = eg_errcode;
+		errcode = eg_errcode;
 		sv_catpv(errstr, (char*)errbuf);
 		if (*(SvEND(errstr)-1) == '\n')
 			--SvCUR(errstr);
@@ -407,7 +407,7 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 	if (DBD_ATTRIB_TRUE(attr,"ora_drcp",8,svp))
 		imp_dbh->using_drcp = 1;
 
-	/* some connection pool atributes  */
+	/* some connection pool attributes  */
 
 	if ((svp=DBD_ATTRIB_GET_SVP(attr, "ora_drcp_class", 14)) && SvOK(*svp)) {
 		STRLEN  svp_len;
@@ -501,7 +501,7 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 		shared_dbh_len 	= SvCUR((shared_dbh_ssv -> sv)) ;
 
 		if (shared_dbh_len > 0 && shared_dbh_len != sizeof (imp_dbh_t))
-			croak ("Invalid value for ora_dbh_dup") ;
+			croak ("Invalid value for ora_dbh_share") ;
 
 		if (shared_dbh_len == sizeof (imp_dbh_t)) {
 		/* initialize from shared data */
@@ -582,7 +582,7 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 			form attribute.
 			}*/
 
-			OCIEnvNlsCreate_log_stat(imp_dbh, &imp_dbh->envhp, init_mode, 0, NULL, NULL, NULL, 0, 0,
+			OCIEnvNlsCreate_log_stat(imp_dbh, &imp_dbh->envhp, init_mode, 0, NULL, NULL, NULL, 0, NULL,
 				charsetid, ncharsetid, status );
 
 			if (status != OCI_SUCCESS) {
@@ -653,7 +653,7 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 	}
 
 	OCIHandleAlloc_ok(imp_dbh, imp_dbh->envhp, &imp_dbh->errhp, OCI_HTYPE_ERROR,  status);
-	OCIAttrGet_log_stat(imp_dbh, imp_dbh->envhp, OCI_HTYPE_ENV, &charsetid, (ub4)0 ,
+	OCIAttrGet_log_stat(imp_dbh, imp_dbh->envhp, OCI_HTYPE_ENV, &charsetid, NULL,
 			OCI_ATTR_ENV_CHARSET_ID, imp_dbh->errhp, status);
 
 	if (status != OCI_SUCCESS) {
@@ -661,7 +661,7 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 		return 0;
 	}
 
-	OCIAttrGet_log_stat(imp_dbh, imp_dbh->envhp, OCI_HTYPE_ENV, &ncharsetid, (ub4)0 ,
+	OCIAttrGet_log_stat(imp_dbh, imp_dbh->envhp, OCI_HTYPE_ENV, &ncharsetid, NULL,
 			OCI_ATTR_ENV_NCHARSET_ID, imp_dbh->errhp, status);
 
 	if (status != OCI_SUCCESS) {
@@ -730,14 +730,14 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
                     (OraText **) &imp_dbh->pool_name,
                     (ub4 *) &imp_dbh->pool_namel,
                     (OraText *) dbname,
-                    strlen(dbname),
+                    (ub4)strlen(dbname),
                     imp_dbh->pool_min,
                     imp_dbh->pool_max,
                     imp_dbh->pool_incr,
                     (OraText *) uid,
-                    strlen(uid),
+                    (ub4)strlen(uid),
                     (OraText *) pwd,
-                    strlen(pwd),
+                    (ub4)strlen(pwd),
                     status);
 
 				if (status != OCI_SUCCESS) {
@@ -1878,7 +1878,7 @@ dbd_rebind_ph_varchar2_table(SV *sth, imp_sth_t *imp_sth, phs_t *phs)
 		phs->maxlen,
 		(ub2)SQLT_STR, phs->array_indicators,
 		phs->array_lengths,	/* ub2 *alen_ptr not needed with OCIBindDynamic */
-		(ub2)0,
+		NULL,
 		(ub4)phs->ora_maxarray_numentries, /* max elements that can fit in allocated array	*/
 		(ub4 *)&(phs->array_numstruct),	/* (ptr to) current number of elements in array	*/
 		OCI_DEFAULT,				/* OCI_DATA_AT_EXEC (bind with callbacks) or OCI_DEFAULT  */
@@ -1910,7 +1910,7 @@ dbd_rebind_ph_varchar2_table(SV *sth, imp_sth_t *imp_sth, phs_t *phs)
 	}
 
 	if (!phs->csid_orig) {	/* get the default csid Oracle would use */
-		OCIAttrGet_log_stat(imp_sth, phs->bndhp, OCI_HTYPE_BIND, &phs->csid_orig, (ub4)0 ,
+		OCIAttrGet_log_stat(imp_sth, phs->bndhp, OCI_HTYPE_BIND, &phs->csid_orig, NULL,
 			OCI_ATTR_CHARSET_ID, imp_sth->errhp, status);
 	}
 
@@ -2314,7 +2314,7 @@ int dbd_rebind_ph_number_table(SV *sth, imp_sth_t *imp_sth, phs_t *phs) {
                            phs->maxlen,
                            (ub2)phs->ora_internal_type, phs->array_indicators,
                            phs->array_lengths,
-                           (ub2)0,
+                           NULL,
                            (ub4)phs->ora_maxarray_numentries, /* max elements that can fit in allocated array	*/
                            (ub4 *)&(phs->array_numstruct),	/* (ptr to) current number of elements in array	*/
                            OCI_DEFAULT,				/* OCI_DATA_AT_EXEC (bind with callbacks) or OCI_DEFAULT  */
@@ -3048,7 +3048,7 @@ dbd_rebind_ph(SV *sth, imp_sth_t *imp_sth, phs_t *phs)
 	}
 
 	if (!phs->csid_orig) {	/* get the default csid Oracle would use */
-		OCIAttrGet_log_stat(imp_sth, phs->bndhp, OCI_HTYPE_BIND, &phs->csid_orig, (ub4)0 ,
+		OCIAttrGet_log_stat(imp_sth, phs->bndhp, OCI_HTYPE_BIND, &phs->csid_orig, NULL,
 		OCI_ATTR_CHARSET_ID, imp_sth->errhp, status);
 	}
 
@@ -3651,7 +3651,7 @@ do_bind_array_exec(sth, imp_sth, phs,utf8,parma_index,tuples_utf8_av,tuples_stat
 	}
 
 	if (!phs->csid_orig) {	  /* get the default csid Oracle would use */
-		OCIAttrGet_log_stat(imp_sth, phs->bndhp, OCI_HTYPE_BIND, &phs->csid_orig, (ub4)0 ,
+		OCIAttrGet_log_stat(imp_sth, phs->bndhp, OCI_HTYPE_BIND, &phs->csid_orig, NULL,
 			OCI_ATTR_CHARSET_ID, imp_sth->errhp, status);
 	}
 
@@ -4037,7 +4037,7 @@ dbd_st_blob_read(SV *sth, imp_sth_t *imp_sth, int field, long offset, long len, 
 		ora_free_templob(sth, imp_sth, (OCILobLocator*)fbh->desc_h);
 	return 0;
 	}
-	ftype = ftype;	/* no unused */
+	(void)ftype;	/* no unused */
 
 	if (DBIc_DBISTATE(imp_sth)->debug >= 3 || dbd_verbose >= 3 )
 	PerlIO_printf(
@@ -4308,7 +4308,7 @@ dbd_st_STORE_attrib(SV *sth, imp_sth_t *imp_sth, SV *keysv, SV *valuesv)
 
 	if (cachesv) /* cache value for later DBI 'quick' fetch? */
 		(void)hv_store((HV*)SvRV(sth), key, kl, cachesv, 0);
-		return TRUE;
+	return TRUE;
 }
 
 
@@ -4343,7 +4343,6 @@ dbd_st_FETCH_attrib(SV *sth, imp_sth_t *imp_sth, SV *keysv)
 	if (kl==4 && strEQ(key, "NAME")) {
 		AV *av = newAV();
         SV *x;
-        D_imp_dbh_from_sth;
 
 		retsv = newRV(sv_2mortal((SV*)av));
 		while(--i >= 0) {

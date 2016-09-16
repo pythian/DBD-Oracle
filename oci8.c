@@ -1127,7 +1127,7 @@ dbd_phs_in(dvoid *octxp, OCIBind *bindp, ub4 iter, ub4 index,
 			phs->alen = 0;
 			phs->indp = 0;
 		}
-	else
+		else
 			if (SvOK(phs->sv)) {
 				*bufpp  = SvPV(phs->sv, phs_len);
 				phs->alen = (phs->alen_incnull) ? phs_len+1 : phs_len;;
@@ -1138,20 +1138,20 @@ dbd_phs_in(dvoid *octxp, OCIBind *bindp, ub4 iter, ub4 index,
 				phs->alen = 0;
 				phs->indp = -1;
 			}
-			*alenp  = phs->alen;
-			*indpp  = &phs->indp;
-			*piecep = OCI_ONE_PIECE;
-            /* MJE commented out as we are avoiding DBIS now but as this is
-               an Oracle callback there is no way to pass something non
-               OCI into this func.
+	*alenp  = phs->alen;
+	*indpp  = &phs->indp;
+	*piecep = OCI_ONE_PIECE;
+	/* MJE commented out as we are avoiding DBIS now but as this is
+	   an Oracle callback there is no way to pass something non
+	   OCI into this func.
 
-			if (DBIS->debug >= 3 || dbd_verbose >= 3 )
-				PerlIO_printf(DBILOGFP, "		in  '%s' [%lu,%lu]: len %2lu, ind %d%s, value=%s\n",
-					phs->name, ul_t(iter), ul_t(index), ul_t(phs->alen), phs->indp,
-					(phs->desc_h) ? " via descriptor" : "",neatsvpv(phs->sv,10));
-            */
-			if (!tuples_av && (index > 0 || iter > 0))
-				croak(" Arrays and multiple iterations not currently supported by DBD::Oracle (in %d/%d)", index,iter);
+	if (DBIS->debug >= 3 || dbd_verbose >= 3 )
+		PerlIO_printf(DBILOGFP, "		in  '%s' [%lu,%lu]: len %2lu, ind %d%s, value=%s\n",
+			phs->name, ul_t(iter), ul_t(index), ul_t(phs->alen), phs->indp,
+			(phs->desc_h) ? " via descriptor" : "",neatsvpv(phs->sv,10));
+	*/
+	if (!tuples_av && (index > 0 || iter > 0))
+		croak(" Arrays and multiple iterations not currently supported by DBD::Oracle (in %d/%d)", index,iter);
 
 	return OCI_CONTINUE;
 }
@@ -1842,7 +1842,7 @@ ora_blob_read_mb_piece(SV *sth, imp_sth_t *imp_sth, imp_fbh_t *fbh,
 	if (dbis->debug >= 3 || dbd_verbose >= 3 )
 		PerlIO_printf(
             DBIc_LOGPIO(imp_sth),
-            "	blob_read field %d, ftype %d, offset %ld, len %lu, "
+            "	blob_read field %d, ftype %d, offset %ld, len %u, "
             "destoffset %ld, retlen %lu\n",
 			fbh->field_num+1, ftype, offset, len, destoffset, ul_t(amtp));
 
