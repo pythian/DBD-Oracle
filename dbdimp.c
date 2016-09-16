@@ -4215,6 +4215,7 @@ dbd_st_destroy(SV *sth, imp_sth_t *imp_sth)
 	int i;
 	sword status;
 	dTHX ;
+	D_imp_dbh_from_sth;
 
 	/*  Don't free the OCI statement handle for a nested cursor. It will
 		be reused by Oracle on the next fetch. Indeed, we never
@@ -4225,8 +4226,7 @@ dbd_st_destroy(SV *sth, imp_sth_t *imp_sth)
 
 	/* if we are using a scrolling cursor we should get rid of the
 	cursor by fetching row 0 */
-
-	if (imp_sth->exe_mode==OCI_STMT_SCROLLABLE_READONLY){
+	if (imp_sth->exe_mode==OCI_STMT_SCROLLABLE_READONLY && DBIc_ACTIVE(imp_dbh)) {
 		OCIStmtFetch_log_stat(imp_sth, imp_sth->stmhp, imp_sth->errhp, 0,OCI_FETCH_NEXT,0,  status);
 	}
 
