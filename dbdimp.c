@@ -442,14 +442,7 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 	if (DBD_ATTRIB_TRUE(attr,"ora_drcp_incr",13,svp))
 		DBD_ATTRIB_GET_IV( attr, "ora_drcp_incr",  13, svp, imp_dbh->pool_incr);
 
-    imp_dbh->driver_name = "DBD01.50_00";
-#endif
-
-#ifdef ORA_OCI_112
-    OCIAttrSet_log_stat(imp_dbh, imp_dbh->seshp,OCI_HTYPE_SESSION,
-                        imp_dbh->driver_name,
-                        (ub4)strlen(imp_dbh->driver_name),
-                        OCI_ATTR_DRIVER_NAME,imp_dbh->errhp, status);
+	imp_dbh->driver_name = "DBD::Oracle : " VERSION;
 #endif
 
     /* TAF Events */
@@ -721,6 +714,7 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 #ifdef ORA_OCI_112
 
 			if (imp_dbh->using_drcp) { /* connect uisng a DRCP */
+				OCIAuthInfo *authp;
 				ub4   purity = OCI_ATTR_PURITY_SELF;
 				/* pool Default values */
 				if (!imp_dbh->pool_min )
@@ -731,6 +725,14 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 					imp_dbh->pool_incr = 2;
 
 				OCIHandleAlloc_ok(imp_dbh, imp_dbh->envhp, &imp_dbh->poolhp, OCI_HTYPE_SPOOL, status);
+				OCIHandleAlloc_ok(imp_dbh, imp_dbh->envhp, &authp, OCI_HTYPE_AUTHINFO, status);
+
+				OCIAttrSet_log_stat(imp_dbh, authp, OCI_HTYPE_AUTHINFO,
+					imp_dbh->driver_name, (ub4)strlen(imp_dbh->driver_name),
+					OCI_ATTR_DRIVER_NAME, imp_dbh->errhp, status);
+
+				OCIAttrSet_log_stat(imp_dbh, imp_dbh->poolhp, OCI_HTYPE_SPOOL,
+					authp, (ub4)0, OCI_ATTR_SPOOL_AUTH, imp_dbh->errhp, status);
 
 				OCISessionPoolCreate_log_stat(
                     imp_dbh,
@@ -754,11 +756,14 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 
 					oci_error(dbh, imp_dbh->errhp, status, "OCISessionPoolCreate");
 					OCIServerDetach_log_stat(imp_dbh, imp_dbh->srvhp, imp_dbh->errhp, OCI_DEFAULT, status);
+					OCIHandleFree_log_stat(imp_dbh, authp, OCI_HTYPE_AUTHINFO, status);
 					OCIHandleFree_log_stat(imp_dbh, imp_dbh->poolhp, OCI_HTYPE_SPOOL,status);
 					OCIHandleFree_log_stat(imp_dbh, imp_dbh->srvhp, OCI_HTYPE_SERVER, status);
 					OCIHandleFree_log_stat(imp_dbh, imp_dbh->errhp, OCI_HTYPE_ERROR,  status);
 					return 0;
 				}
+
+				OCIHandleFree_log_stat(imp_dbh, authp, OCI_HTYPE_AUTHINFO, status);
 
 				OCIHandleAlloc_ok(imp_dbh, imp_dbh->envhp, &imp_dbh->authp, OCI_HTYPE_AUTHINFO, status);
 
@@ -825,6 +830,12 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 					OCIHandleAlloc_ok(imp_dbh, imp_dbh->envhp, &imp_dbh->seshp, OCI_HTYPE_SESSION, status);
 
 					cred_type = ora_parse_uid(imp_dbh, &uid, &pwd);
+
+#ifdef ORA_OCI_112
+					OCIAttrSet_log_stat(imp_dbh, imp_dbh->seshp, (ub4)OCI_HTYPE_SESSION,
+						imp_dbh->driver_name, (ub4)strlen(imp_dbh->driver_name),
+						(ub4)OCI_ATTR_DRIVER_NAME, imp_dbh->errhp, status);
+#endif
 
 					OCISessionBegin_log_stat(imp_dbh, imp_dbh->svchp, imp_dbh->errhp, imp_dbh->seshp,cred_type, sess_mode_type, status);
 
