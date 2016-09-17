@@ -298,6 +298,10 @@ package DBD::Oracle;
 	   $attr->{ora_drcp_rlb} = $ENV{ORA_DRCP_RLB}
 	}
 
+	if (exists $ENV{ORA_EVENTS}) {
+	   $attr->{ora_events} = $ENV{ORA_EVENTS};
+	}
+
 	{
 	   local @SIG{ @{ $attr->{ora_connect_with_default_signals} } }
           if $attr->{ora_connect_with_default_signals};
@@ -387,6 +391,7 @@ package DBD::Oracle;
                  ora_svchp		=> undef,
                  ora_errhp		=> undef,
                  ora_init_mode		=> undef,
+                 ora_events		=> undef,
                  ora_charset		=> undef,
                  ora_ncharset		=> undef,
                  ora_session_mode	=> undef,
@@ -1773,6 +1778,12 @@ string.
   our $orashr : shared = '' ;
 
   $dbh = DBI->connect ($dsn, $user, $passwd, {ora_dbh_share => \$orashr}) ;
+
+=head4 ora_events
+
+Set this attribute to C<1> to enable Oracle Fast Application Notification
+(FAN) in a new OCI environment. Can also be set via the C<ORA_EVENTS>
+environment variable.
 
 =head4 ora_envhp
 

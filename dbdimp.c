@@ -657,6 +657,10 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
     if (!imp_dbh->envhp ) {
 		SV **init_mode_sv;
 		ub4 init_mode = OCI_OBJECT;/* needed for LOBs (8.0.4)	*/
+
+		if (DBD_ATTRIB_TRUE(attr, "ora_events", 10, svp))
+			init_mode |= OCI_EVENTS; /* Needed for Oracle Fast Application Notification (FAN). */
+
 		DBD_ATTRIB_GET_IV(attr, "ora_init_mode",13, init_mode_sv, init_mode);
 
 #if defined(USE_ITHREADS) || defined(MULTIPLICITY) || defined(USE_5005THREADS)

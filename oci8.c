@@ -288,7 +288,9 @@ oci_mode(ub4  mode)
 	dTHX;
 	SV *sv;
 	switch (mode) {
-		case 3:					return "THREADED | OBJECT";
+		case OCI_THREADED | OCI_OBJECT:	return "THREADED | OBJECT";
+		case OCI_OBJECT | OCI_EVENTS:	return "OBJECT | EVENTS";
+		case OCI_THREADED | OCI_OBJECT | OCI_EVENTS:	return "THREADED | OBJECT | EVENTS";
 		case OCI_DEFAULT:		return "DEFAULT";
 		/* the default value for parameters and attributes */
 		/*-------------OCIInitialize Modes / OCICreateEnvironment Modes -------------*/
