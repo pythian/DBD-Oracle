@@ -202,6 +202,26 @@ dbd_init(dbistate_t *dbistate)
 }
 
 
+void
+dbd_dr_destroy(SV *drh, imp_drh_t *imp_drh)
+{
+	dTHX;
+	sword status;
+
+	/* We rely on the DBI dispatcher to destroy all child handles before we get here (DBI >= 1.623). */
+
+	if (imp_drh->leak_state) {
+		/* With ithreads, we can't tell when the last dr handle is destroyed. */
+		return;
+	}
+
+	if (imp_drh->envhp) {
+		/* Free cached environment handle. */
+		OCIHandleFree_log_stat(imp_drh, imp_drh->envhp, OCI_HTYPE_ENV, status);
+	}
+}
+
+
 int
 dbd_discon_all(SV *drh, imp_drh_t *imp_drh)
 {
@@ -395,7 +415,6 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 	D_imp_drh_from_dbh;
 	ub2 new_charsetid = 0;
 	ub2 new_ncharsetid = 0;
-	int forced_new_environment = 0;
 #if defined(USE_ITHREADS) && defined(PERL_MAGIC_shared_scalar)
 	SV **	shared_dbh_priv_svp ;
 	SV *	shared_dbh_priv_sv ;
@@ -514,6 +533,9 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 		} else {
 			shared_dbh = NULL ;
 		}
+
+		/* With ithreads, we can't tell when the last dr handle is destroyed. */
+		imp_drh->leak_state = 1;
 	}
 #endif
 
@@ -522,17 +544,13 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 	if ((svp=DBD_ATTRIB_GET_SVP(attr, "ora_envhp", 9)) && SvOK(*svp)) {
 		if (!SvTRUE(*svp)) {
 			imp_dbh->envhp = NULL; /* force new environment */
-			forced_new_environment = 1;
 		}
 	}
     /* RT46739 */
     if (imp_dbh->envhp) {
-        OCIError *errhp;
-        OCIHandleAlloc_ok(imp_dbh, imp_dbh->envhp, &errhp, OCI_HTYPE_ERROR,  status);
+        OCIHandleAlloc_ok(imp_dbh, imp_dbh->envhp, &imp_dbh->errhp, OCI_HTYPE_ERROR, status);
         if (status != OCI_SUCCESS) {
             imp_dbh->envhp = NULL;
-        } else {
-			OCIHandleFree_log_stat(imp_dbh, errhp, OCI_HTYPE_ERROR,  status);
         }
     }
 
@@ -590,8 +608,6 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 					"OCIEnvNlsCreate. Check ORACLE_HOME (Linux) env var  or PATH (Windows) and or NLS settings, permissions, etc.");
 				return 0;
 			}
-			if (!imp_drh->envhp)	/* cache first envhp info drh as future default */
-				imp_drh->envhp = imp_dbh->envhp;
 
 			svp = DBD_ATTRIB_GET_SVP(attr, "ora_charset", 11);/*get the charset passed in by the user*/
 			if (svp) {
@@ -622,7 +638,7 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 			if (new_charsetid || new_ncharsetid) { /* reset the ENV with the new charset  from above*/
 				if (new_charsetid) charsetid = new_charsetid;
 				if (new_ncharsetid) ncharsetid = new_ncharsetid;
-				imp_dbh->envhp = NULL;
+				OCIHandleFree_log_stat(imp_dbh, imp_dbh->envhp, OCI_HTYPE_ENV, status);
 				OCIEnvNlsCreate_log_stat(imp_dbh, &imp_dbh->envhp, init_mode, 0, NULL, NULL, NULL, 0, 0,
 							charsetid, ncharsetid, status );
 				if (status != OCI_SUCCESS) {
@@ -630,9 +646,10 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 						"OCIEnvNlsCreate. Check ORACLE_HOME (Linux) env var  or PATH (Windows) and or NLS settings, permissions, etc");
 					return 0;
 				}
-				if (!imp_drh->envhp)	/* cache first envhp info drh as future default */
-					imp_drh->envhp = imp_dbh->envhp;
 			}
+
+			if (!imp_drh->envhp)	/* cache first envhp info drh as future default */
+				imp_drh->envhp = imp_dbh->envhp;
 
 			/* update the hard-coded csid constants for unicode charsets */
 			utf8_csid	   = OCINlsCharSetNameToId(imp_dbh->envhp, (void*)"UTF8");
@@ -642,17 +659,10 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 
 	}
 
-	if (shared_dbh_ssv) { /*is this a cached or shared handle from DBI*/
-		if (!imp_dbh->envhp) { /*no hande so create a new one*/
-        	OCIEnvInit_log_stat(imp_dbh, &imp_dbh->envhp, OCI_DEFAULT, 0, 0, status);
-			if (status != OCI_SUCCESS) {
-				oci_error(dbh, (OCIError*)imp_dbh->envhp, status, "OCIEnvInit");
-				return 0;
-			}
-		}
+	if (!imp_dbh->errhp) {
+		OCIHandleAlloc_ok(imp_dbh, imp_dbh->envhp, &imp_dbh->errhp, OCI_HTYPE_ERROR,  status);
 	}
 
-	OCIHandleAlloc_ok(imp_dbh, imp_dbh->envhp, &imp_dbh->errhp, OCI_HTYPE_ERROR,  status);
 	OCIAttrGet_log_stat(imp_dbh, imp_dbh->envhp, OCI_HTYPE_ENV, &charsetid, NULL,
 			OCI_ATTR_ENV_CHARSET_ID, imp_dbh->errhp, status);
 
@@ -802,8 +812,9 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
                         OCIHandleFree_log_stat(imp_dbh, imp_dbh->srvhp, OCI_HTYPE_SERVER, status);
                         OCIHandleFree_log_stat(imp_dbh, imp_dbh->errhp, OCI_HTYPE_ERROR, status);
                         OCIHandleFree_log_stat(imp_dbh, imp_dbh->svchp, OCI_HTYPE_SVCCTX, status);
-                        if (forced_new_environment)
+                        if (imp_dbh->envhp != imp_drh->envhp) {
                             OCIHandleFree_log_stat(imp_dbh, imp_dbh->envhp, OCI_HTYPE_ENV, status);
+                        }
                         return 0;
                     }
 
@@ -829,8 +840,9 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 						OCIHandleFree_log_stat(imp_dbh, imp_dbh->srvhp, OCI_HTYPE_SERVER, status);
 						OCIHandleFree_log_stat(imp_dbh, imp_dbh->errhp, OCI_HTYPE_ERROR,  status);
 						OCIHandleFree_log_stat(imp_dbh, imp_dbh->svchp, OCI_HTYPE_SVCCTX, status);
-						if (forced_new_environment)
+						if (imp_dbh->envhp != imp_drh->envhp) {
 							OCIHandleFree_log_stat(imp_dbh, imp_dbh->envhp, OCI_HTYPE_ENV, status);
+						}
 						return 0;
 					}
 
@@ -847,9 +859,6 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 	DBIc_ACTIVE_on(imp_dbh);	/* call disconnect before freeing	*/
 	imp_dbh->ph_type = 1;	/* SQLT_CHR "(ORANET TYPE) character string" */
 	imp_dbh->ph_csform = 0;	/* meaning auto (see dbd_rebind_ph)	*/
-
-	if (!imp_drh->envhp)	/* cache first envhp info drh as future default */
-		imp_drh->envhp = imp_dbh->envhp;
 
 #if defined(USE_ITHREADS) && defined(PERL_MAGIC_shared_scalar)
 	if (shared_dbh_ssv && !shared_dbh) {
@@ -1025,6 +1034,7 @@ dbd_db_destroy(SV *dbh, imp_dbh_t *imp_dbh)
 	dTHX ;
 	int refcnt = 1 ;
 	sword status;
+	D_imp_drh_from_dbh;
 
 #if defined(USE_ITHREADS) && defined(PERL_MAGIC_shared_scalar)
 	if (DBIc_IMPSET(imp_dbh) && imp_dbh->shared_dbh) {
@@ -1065,19 +1075,45 @@ dbd_db_destroy(SV *dbh, imp_dbh_t *imp_dbh)
 #endif
 			OCIHandleFree_log_stat(imp_dbh, imp_dbh->seshp, OCI_HTYPE_SESSION,status);
 			OCIHandleFree_log_stat(imp_dbh, imp_dbh->svchp, OCI_HTYPE_SVCCTX, status);
-
 #ifdef ORA_OCI_112
 		}
 #endif
 		OCIHandleFree_log_stat(imp_dbh, imp_dbh->srvhp, OCI_HTYPE_SERVER, status);
-
+		OCIHandleFree_log_stat(imp_dbh, imp_dbh->errhp, OCI_HTYPE_ERROR,  status);
+		if (imp_dbh->envhp != imp_drh->envhp) {
+			OCIHandleFree_log_stat(imp_dbh, imp_dbh->envhp, OCI_HTYPE_ENV, status);
+		}
 	}
-	OCIHandleFree_log_stat(imp_dbh, imp_dbh->errhp, OCI_HTYPE_ERROR,  status);
+	else {
+		/* A new error handle is allocated on each new connect, so it is also freed when
+		   refcnt > 1. Note that we cannot have a common free here, since it is an error
+		   to free the environment handle before the error handle. */
+		OCIHandleFree_log_stat(imp_dbh, imp_dbh->errhp, OCI_HTYPE_ERROR, status);
+	}
 dbd_db_destroy_out:
 	DBIc_IMPSET_off(imp_dbh);
 }
 
 
+SV *
+dbd_take_imp_data(SV *dbh, imp_xxh_t *imp_xxh, void* foo)
+{
+	dTHX;
+	D_imp_dbh(dbh);
+	D_imp_drh_from_dbh;
+
+	/* With ithreads, we can't tell when the last dr handle is destroyed. */
+	imp_drh->leak_state = 1;
+
+	/* Indicate that SUPER::take_imp_data should be called. */
+	return &PL_sv_no;
+}
+
+
+/* According to Oracle's documentation of OCISessionGet, attributes should not be changed
+   on the server and session handles attached to OCISessionGet's service context handle.
+   This would imply that dbd_db_STORE_attrib is wrong for session pooling, however
+   it seems to work just fine... */
 int
 dbd_db_STORE_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv, SV *valuesv)
 {

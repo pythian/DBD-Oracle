@@ -45,7 +45,7 @@ package DBD::Oracle;
 
     my $Revision = substr(q$Revision: 1.103 $, 10);
 
-    require_version DBI 1.51;
+    require_version DBI 1.623;
 
     DBD::Oracle->bootstrap($DBD::Oracle::VERSION);
 

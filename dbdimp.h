@@ -21,6 +21,7 @@ typedef struct imp_fbh_st imp_fbh_t;
 struct imp_drh_st {
 	dbih_drc_t com;		/* MUST be first element in structure	*/
 	OCIEnv *envhp;
+	bool leak_state;
 	SV *ora_long;
 	SV *ora_trunc;
 	SV *ora_cache;
@@ -394,6 +395,7 @@ sb4 reg_taf_callback _((SV *dbh, imp_dbh_t *imp_dbh));
 /* These defines avoid name clashes for multiple statically linked DBD's	*/
 
 #define dbd_init			ora_init
+#define dbd_dr_destroy		ora_dr_destroy
 #define dbd_db_login		ora_db_login
 #define dbd_db_login6		ora_db_login6
 #define dbd_db_do			ora_db_do
@@ -402,6 +404,7 @@ sb4 reg_taf_callback _((SV *dbh, imp_dbh_t *imp_dbh));
 #define dbd_db_cancel		ora_db_cancel
 #define dbd_db_disconnect	ora_db_disconnect
 #define dbd_db_destroy		ora_db_destroy
+#define dbd_take_imp_data	ora_take_imp_data
 #define dbd_db_STORE_attrib	ora_db_STORE_attrib
 #define dbd_db_FETCH_attrib	ora_db_FETCH_attrib
 #define dbd_st_prepare		ora_st_prepare

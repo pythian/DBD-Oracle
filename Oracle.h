@@ -60,6 +60,7 @@
 
 void	dbd_init _((dbistate_t *dbistate));
 void	dbd_init_oci_drh _((imp_drh_t * imp_drh));
+void	dbd_dr_destroy _((SV *drh, imp_drh_t *imp_drh));
 
 int	 dbd_db_login  _((SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *user, char *pwd));
 int	 dbd_db_do _((SV *sv, char *statement));

@@ -17,7 +17,7 @@ use Pod::Usage;
 # For those not using Dynamic loading this means building a
 # new static perl in the DBI directory by saying 'make perl'
 # and then using _that_ perl to make this one.
-use DBI 1.51;
+use DBI 1.623;
 use DBI::DBD;	# DBD creation tools
 
 
@@ -45,7 +45,7 @@ my %opts = (
     NAME => 'DBD::Oracle',
     VERSION_FROM => 'lib/DBD/Oracle.pm',
     PREREQ_PM => { "Test::Simple" => 0.90, # actually Test::More pkg in T::S dist
-                   "DBI"          => 1.51},
+                   "DBI"          => 1.623},
     OBJECT => '$(O_FILES)',
     DEFINE => '',
     DIR  => [],
@@ -56,8 +56,8 @@ my %opts = (
 	COMPRESS	=> 'gzip -v9', SUFFIX => 'gz',
     },
     META_MERGE => {
-       configure_requires => { "DBI" => '1.51' },
-       build_requires => {"DBI" => '1.51',
+       configure_requires => { "DBI" => '1.623' },
+       build_requires => {"DBI" => '1.623',
                           "ExtUtils::MakeMaker" => 0,
                           "Test::Simple" => '0.90'},
        resources => {
@@ -81,7 +81,7 @@ $eumm =~ tr/_//d;
 if ($eumm >= 5.43) {
     $opts{AUTHOR} = 'Tim Bunce (dbi-users@perl.org)';
     $opts{ABSTRACT_FROM} = 'lib/DBD/Oracle.pm';
-    $opts{PREREQ_PM} = { DBI => 1.51 };
+    $opts{PREREQ_PM} = { DBI => 1.623 };
     $opts{CAPI} = 'TRUE' if $Config{archname} =~ /-object\b/i;
 }
 
