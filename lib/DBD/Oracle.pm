@@ -294,6 +294,9 @@ package DBD::Oracle;
 	if (exists $ENV{ORA_DRCP_INCR}) {
 	   $attr->{ora_drcp_incr} = $ENV{ORA_DRCP_INCR}
 	}
+	if (exists $ENV{ORA_DRCP_RLB}) {
+	   $attr->{ora_drcp_rlb} = $ENV{ORA_DRCP_RLB}
+	}
 
 	{
 	   local @SIG{ @{ $attr->{ora_connect_with_default_signals} } }
@@ -396,6 +399,7 @@ package DBD::Oracle;
                  ora_drcp_min		=> undef,
                  ora_drcp_max		=> undef,
                  ora_drcp_incr		=> undef,
+                 ora_drcp_rlb		=> undef,
                  ora_oratab_orahome	=> undef,
                  ora_module_name	=> undef,
                  ora_driver_name	=> undef,
@@ -1564,16 +1568,24 @@ than 1024 characters.
 This value can be also be specified with the C<ORA_DRCP_CLASS>
 environment variable.
 
+Note that a connection class must be specified in order to enable
+inter-process sharing of server side sessions.
+
 =head4 ora_drcp_min
 
 This optional value specifies the minimum number of sessions that are
-initially opened.  New sessions are only opened after this value has
-been reached.
+initially allocated for the application process.  New sessions are only
+allocated after this value has been reached.
 
-The default value is 4 and  any value above 0 is valid.
+The default value is 0 and any value greater than or equal to 0 is valid.
 
-Generally, it should be set to the number of concurrent statements the
-application is planning or expecting to run.
+For multi-process applications, it is recommended to leave the value at 0.
+This ensures that each process is only occupying a server session while
+the process is doing database work.
+
+For multi-threaded applications, the value could be set to the number of
+concurrent statements the application is planning or expecting to run.
+Please note that DRCP has not been tested with multi-threading.
 
 This value can also be specified with the C<ORA_DRCP_MIN> environment
 variable.
@@ -1582,7 +1594,7 @@ variable.
 
 This optional value specifies the maximum number of sessions that can
 be open at one time.  Once reached no more sessions can be opened
-until one becomes free. The default value is 40 and any value above 1
+until one becomes free. The default value is 40 and any value above 0
 is valid.  You should not set this value lower than ora_drcp_min as
 that will just waste resources.
 
@@ -1593,11 +1605,20 @@ variable.
 
 This optional value specifies the next increment for sessions to be
 started if the current number of sessions are less than
-ora_drcp_max. The default value is 2 and any value above 0 is
+ora_drcp_max. The default value is 1 and any value above 0 is
 valid as long as the value of ora_drcp_min + ora_drcp_incr is not
 greater than ora_drcp_max.
 
 This value can also be specified with the C<ORA_DRCP_INCR> environment
+variable.
+
+=head4 ora_drcp_rlb
+
+This optional value controls whether run-time connection load balancing
+is used for Oracle RAC. The default value is 0, which disables the feature.
+Set the value to 1 to enable the feature.
+
+This value can also be specified with the C<ORA_DRCP_RLB> environment
 variable.
 
 =head4 ora_taf
@@ -1661,6 +1682,8 @@ a SID so that Oracle then uses the value of ORACLE_SID (not
 TWO_TASK) environment variable to connect to a local instance. Also
 the username and password should be empty, and the user executing the
 script needs to be part of the dba group or osdba group.
+
+Note that this does not work with DRCP.
 
 =head4 ora_oratab_orahome
 
@@ -1766,6 +1789,11 @@ The OCI environment holds information about the client side context,
 such as the local NLS environment. By altering C<%ENV> and setting
 ora_envhp to 0 you can create connections with different NLS
 settings. This is most useful for testing.
+
+Note that for DRCP, setting C<ora_envhp = 0> has no effect. Here,
+a new session pool is created, using the current NLS environment,
+for each new combination of dbname, uid/pwd, connection class,
+and charset/ncharset.
 
 =head4 ora_charset, ora_ncharset
 
@@ -1924,7 +1952,7 @@ variables.
 =head2 B<connect_cached>
 
 Implemented by DBI, no driver-specific impact.
-Please note that connect_cached as not been tested with DRCP.
+Please note that connect_cached has not been tested with DRCP.
 
 =head2 B<data_sources>
 
@@ -2096,7 +2124,7 @@ DBMS_OUTPUT.PUT, or DBMS_OUTPUT.NEW_LINE.
 =head2 B<reauthenticate ( $username, $password )>
 
 Starts a new session against the current database using the credentials
-supplied.
+supplied. Note that this does not work with DRCP.
 
 
 =head2 B<private_attribute_info>

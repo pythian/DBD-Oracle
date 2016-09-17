@@ -4260,16 +4260,7 @@ ora_parse_uid(imp_dbh_t *imp_dbh, char **uidp, char **pwdp)
 		return OCI_CRED_EXT;
 	}
 #ifdef ORA_OCI_112
-    if (imp_dbh->using_drcp){
-		OCIAttrSet_log_stat(imp_dbh, imp_dbh->authp, OCI_HTYPE_SESSION,
-			*uidp, strlen(*uidp),
-			(ub4) OCI_ATTR_USERNAME, imp_dbh->errhp, status);
-
-		OCIAttrSet_log_stat(imp_dbh, imp_dbh->authp, OCI_HTYPE_SESSION,
-			(strlen(*pwdp)) ? *pwdp : NULL, strlen(*pwdp),
-			(ub4) OCI_ATTR_PASSWORD, imp_dbh->errhp, status);
-	}
-	else {
+	if (!imp_dbh->using_drcp) {
 #endif
 		OCIAttrSet_log_stat(imp_dbh, imp_dbh->seshp, OCI_HTYPE_SESSION,
 				*uidp, strlen(*uidp),
@@ -4290,6 +4281,11 @@ ora_db_reauthenticate(SV *dbh, imp_dbh_t *imp_dbh, char *uid, char *pwd)
 {
 	dTHX;
 	sword status;
+#ifdef ORA_OCI_112
+	if (imp_dbh->using_drcp) {
+		return 0;
+	}
+#endif
 	/* XXX should possibly create new session before ending the old so	*/
 	/* that if the new one can't be created, the old will still work.	*/
 	OCISessionEnd_log_stat(imp_dbh, imp_dbh->svchp, imp_dbh->errhp,

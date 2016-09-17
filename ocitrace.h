@@ -44,12 +44,12 @@
 				 OciTp, sc,oci_status_name(stat)),stat \
 	: stat
 
-#define OCISessionRelease_log_stat(impdbh,svchp, errhp,stat)            \
-	stat =OCISessionRelease(svchp, errhp, NULL, (ub4)0, OCI_DEFAULT);\
+#define OCISessionRelease_log_stat(impdbh,svchp,errhp,tag,tagl,mode,stat)	\
+	stat =OCISessionRelease(svchp, errhp, tag, tagl, mode);\
 	(DBD_OCI_TRACEON(impdbh))                                       \
     ? PerlIO_printf(DBD_OCI_TRACEFP(impdbh),                             \
-						 "%sOCISessionRelease(svchp=%p)=%s\n",\
-						 OciTp, svchp,oci_status_name(stat)),stat \
+						 "%sOCISessionRelease(svchp=%p,tag=\"%s\",mode=%u)=%s\n",\
+						 OciTp, svchp,tag,mode,oci_status_name(stat)),stat	\
 	: stat
 
 #define OCISessionPoolDestroy_log_stat(impdbh, ph, errhp,stat )  \
@@ -59,20 +59,20 @@
 					 "%sOCISessionPoolDestroy(ph=%p)=%s\n",\
 					 OciTp, ph,oci_status_name(stat)),stat \
 	: stat
-#define OCISessionGet_log_stat(impdbh,envhp, errhp, sh, ah,pn,pnl,stat) \
-	stat =OCISessionGet(envhp, errhp, sh, ah,pn,pnl,NULL,0, NULL, NULL, NULL, OCI_SESSGET_SPOOL);\
+#define OCISessionGet_log_stat(impdbh,envhp,errhp,sh,ah,pn,pnl,tag,tagl,found,stat) \
+	stat =OCISessionGet(envhp, errhp, sh, ah,pn,pnl,tag,tagl, NULL, NULL, found, OCI_SESSGET_SPOOL);\
 	(DBD_OCI_TRACEON(impdbh))                                          \
     ? PerlIO_printf(DBD_OCI_TRACEFP(impdbh),                           \
-					 "%sOCISessionGet(envhp=%p,sh=%p,ah=%p,pn=%p,pnl=%d)=%s\n",\
-					 OciTp, envhp,sh,ah,pn,pnl,oci_status_name(stat)),stat \
+					 "%sOCISessionGet(envhp=%p,sh=%p,ah=%p,pn=%p,pnl=%d,tag=\"%s\",found=%d)=%s\n",\
+					 OciTp, envhp,sh,ah,pn,pnl,tag,*found,oci_status_name(stat)),stat \
 	: stat
 
-#define OCISessionPoolCreate_log_stat(impdbh,envhp,errhp,ph,pn,pnl,dbn,dbl,sn,sm,si,un,unl,pw,pwl,stat) \
-    stat =OCISessionPoolCreate(envhp,errhp,ph,pn,pnl,dbn,dbl,sn,sm,si,un,unl,pw,pwl,OCI_DEFAULT);\
+#define OCISessionPoolCreate_log_stat(impdbh,envhp,errhp,ph,pn,pnl,dbn,dbl,sn,sm,si,un,unl,pw,pwl,mode,stat) \
+    stat =OCISessionPoolCreate(envhp,errhp,ph,pn,pnl,dbn,dbl,sn,sm,si,un,unl,pw,pwl,mode);\
     (DBD_OCI_TRACEON(impdbh))                                          \
     ? PerlIO_printf(DBD_OCI_TRACEFP(impdbh),                           \
-					 "%sOCISessionPoolCreate(envhp=%p,ph=%p,pn=%p,pnl=%p,min=%d,max=%d,incr=%d, un=%s,unl=%d,pw=%s,pwl=%d)=%s\n",\
-					 OciTp, envhp,ph,pn,pnl,sn,sm,si,un,unl,pw,pwl,oci_status_name(stat)),stat \
+					 "%sOCISessionPoolCreate(envhp=%p,ph=%p,pn=%p,pnl=%p,min=%d,max=%d,incr=%d, un=%s,unl=%d,pw=%s,pwl=%d,mode=%u)=%s\n",\
+					 OciTp, envhp,ph,pn,pnl,sn,sm,si,un,unl,pw,pwl,mode,oci_status_name(stat)),stat \
 	: stat
 
 #if defined(ORA_OCI_102)

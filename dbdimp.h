@@ -22,11 +22,27 @@ struct imp_drh_st {
 	dbih_drc_t com;		/* MUST be first element in structure	*/
 	OCIEnv *envhp;
 	bool leak_state;
+#ifdef ORA_OCI_112
+	HV *charset_hv;
+	HV *pool_hv;
+#endif
 	SV *ora_long;
 	SV *ora_trunc;
 	SV *ora_cache;
 	SV *ora_cache_o;		/* for ora_open() cache override */
 };
+
+#ifdef ORA_OCI_112
+typedef struct session_pool_st session_pool_t;
+struct session_pool_st {
+	OCIEnv		*envhp;
+	OCIError 	*errhp;
+	OCISPool	*poolhp;
+	OraText		*pool_name;
+	ub4		pool_namel;
+	int		active_sessions;
+};
+#endif
 
 /* Define dbh implementor data structure */
 struct imp_dbh_st {
@@ -45,16 +61,16 @@ struct imp_dbh_st {
 	OCISvcCtx 	*svchp;
 	OCISession	*seshp;
 #ifdef ORA_OCI_112
-	OCIAuthInfo *authp;
-	OCISPool    *poolhp;
-	text        *pool_name;
-	ub4			pool_namel;
+	session_pool_t	*pool;
+	OraText		session_tag[50];
+	boolean		session_tag_found;
 	bool		using_drcp;
 	text		*pool_class;
 	ub4			pool_classl;
 	ub4			pool_min;
 	ub4			pool_max;
 	ub4			pool_incr;
+	ub4			pool_rlb;
 	char		*driver_name;/*driver name user defined*/
 #endif
     SV          *taf_function; /*User supplied TAF functiomn*/
