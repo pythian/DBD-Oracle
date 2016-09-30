@@ -844,6 +844,8 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 		if (imp_dbh->using_drcp) { /* connect using a DRCP */
 			OCIAuthInfo *authp;
 			ub4   purity = OCI_ATTR_PURITY_SELF;
+			OraText *rettag;
+			ub4 rettagl;
 			/* pool Default values */
 			if (!imp_dbh->pool_min )
 				imp_dbh->pool_min = 0;
@@ -930,7 +932,7 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 
 			OCISessionGet_log_stat(imp_dbh, imp_dbh->envhp, imp_dbh->errhp, &imp_dbh->svchp, authp,
 						pool->pool_name, (ub4)strlen((char *)pool->pool_name),
-						imp_dbh->session_tag, (ub4)strlen((char *)imp_dbh->session_tag), &imp_dbh->session_tag_found, status);
+						imp_dbh->session_tag, (ub4)strlen((char *)imp_dbh->session_tag), &rettag, &rettagl, &imp_dbh->session_tag_found, status);
 			if (status != OCI_SUCCESS) {
 				oci_error(dbh, imp_dbh->errhp, status, "OCISessionGet");
 				OCIHandleFree_log_stat(imp_dbh, authp, OCI_HTYPE_AUTHINFO, status);

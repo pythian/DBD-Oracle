@@ -59,8 +59,8 @@
 					 "%sOCISessionPoolDestroy(ph=%p)=%s\n",\
 					 OciTp, ph,oci_status_name(stat)),stat \
 	: stat
-#define OCISessionGet_log_stat(impdbh,envhp,errhp,sh,ah,pn,pnl,tag,tagl,found,stat) \
-	stat =OCISessionGet(envhp, errhp, sh, ah,pn,pnl,tag,tagl, NULL, NULL, found, OCI_SESSGET_SPOOL);\
+#define OCISessionGet_log_stat(impdbh,envhp,errhp,sh,ah,pn,pnl,tag,tagl,rettag,rettagl,found,stat) \
+	stat =OCISessionGet(envhp, errhp, sh, ah,pn,pnl,tag,tagl,rettag,rettagl,found, OCI_SESSGET_SPOOL);\
 	(DBD_OCI_TRACEON(impdbh))                                          \
     ? PerlIO_printf(DBD_OCI_TRACEFP(impdbh),                           \
 					 "%sOCISessionGet(envhp=%p,sh=%p,ah=%p,pn=%p,pnl=%d,tag=\"%s\",found=%d)=%s\n",\
