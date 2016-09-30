@@ -181,7 +181,7 @@ sub connect_dbh {
 
 sub session_id {
     my $dbh = shift;
-    my ($s) = $dbh->selectrow_array("select userenv('sessionid') from dual");
+    my ($s) = $dbh->selectrow_array("select userenv('sid') from dual");
     return $s;
 }
 __END__
