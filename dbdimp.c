@@ -1023,6 +1023,7 @@ void
 dbd_db_destroy(SV *dbh, imp_dbh_t *imp_dbh)
 {
 	dTHX ;
+	D_imp_drh_from_dbh;
 	int refcnt = 1 ;
 	sword status;
 
@@ -1070,7 +1071,8 @@ dbd_db_destroy(SV *dbh, imp_dbh_t *imp_dbh)
 		}
 #endif
 		OCIHandleFree_log_stat(imp_dbh, imp_dbh->srvhp, OCI_HTYPE_SERVER, status);
-
+		if (imp_dbh->envhp != imp_drh->envhp)
+			OCIHandleFree_log_stat(imp_dbh, imp_dbh->envhp, OCI_HTYPE_ENV, status);
 	}
 	OCIHandleFree_log_stat(imp_dbh, imp_dbh->errhp, OCI_HTYPE_ERROR,  status);
 dbd_db_destroy_out:
