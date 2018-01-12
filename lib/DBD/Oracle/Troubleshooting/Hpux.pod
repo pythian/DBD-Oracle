@@ -666,7 +666,7 @@ the extra link options.
 Gram M. Ludlow writes:
 
 I recently had a problem with Oracle 9 64-bit on HPUX 11i. We have
-another application that required SH_LIBARY_PATH to point to the 64-bit
+another application that required SH_LIBRARY_PATH to point to the 64-bit
 libraries, which "broke" the Oraperl module. So I did some research and
 successfully recompiled and re-installed with the most recent versions of
 everything (perl, DBI, DBD) that works with 64-bit shared libraries. This
