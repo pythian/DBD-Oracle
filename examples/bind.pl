@@ -31,7 +31,7 @@ while ( <STDIN> ) {
     last if ! $_;
     $sth->execute( uc( $_ ) );
 
-    # Note that the variable is in parenthesis to give an array context
+    # Note that the variable is in parentheses to force array context
     if ( ( $created ) = $sth->fetchrow_array ) {
         print "$created\n";
     }

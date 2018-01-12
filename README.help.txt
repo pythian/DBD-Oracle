@@ -156,7 +156,7 @@ Environment:  Solaris, GCC
 
 Do not use GNU as or GNU ld on Solaris. Delete or rename them, they are
 just bad news.  In the words of John D Groenveld <groenvel@cse.psu.edu>:
-Run, dont walk, to your console and 'mv /opt/gnu/bin/as /opt/gnu/bin/gas;
+Run, don't walk, to your console and 'mv /opt/gnu/bin/as /opt/gnu/bin/gas;
 mv /opt/gnu/bin/ld /opt/gnu/bin/gld'. You can add -v to the gcc command
 in the Makefile to see what GCC is using.
 

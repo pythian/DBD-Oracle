@@ -3374,7 +3374,7 @@ DBI documentation for more details.
 Fetches the next row of data from the statement handle, and returns a reference to an array
 holding the column values. Any columns that are NULL are returned as undef within the array.
 
-If there are no more rows or if an error occurs, the this method return undef. You should
+If there are no more rows or if an error occurs, this method returns undef. You should
 check C<< $sth->err >> afterwards (or use the L</RaiseError> attribute) to discover if the undef returned
 was due to an error.
 
@@ -3397,7 +3397,7 @@ a reference to a list. Do not use this in a scalar context.
 Fetches the next row of data and returns a hashref containing the name of the columns as the keys
 and the data itself as the values. Any NULL value is returned as undef value.
 
-If there are no more rows or if an error occurs, the this method return undef. You should
+If there are no more rows or if an error occurs, this method returns undef. You should
 check C<< $sth->err >> afterwards (or use the L</RaiseError> attribute) to discover if the undef returned
 was due to an error.
 
@@ -3848,7 +3848,7 @@ With this interface DBD::Oracle handles your data utilizing LOB Locator OCI call
 
 =item L</LOB Locator Method Interface>
 
-This allows the user direct access to the LOB Locator methods, so you have to take case of the LOB Locator operations yourself.
+This allows the user direct access to the LOB Locator methods, so you have to take care of the LOB Locator operations yourself.
 
 =back
 
@@ -3894,8 +3894,8 @@ used, normally one can get an entire LOB is a single round trip.
 =head3 Simple Fetch for LONGs and LONG RAWs
 
 As the name implies this is the simplest way to use this interface. DBD::Oracle just attempts to get your LONG datatypes as a single large piece.
-There are no special settings, simply set the database handle's 'LongReadLen' attribute to a value that will be the larger than the expected size of the LONG or LONG RAW.
-If the size of the LONG or LONG RAW exceeds  the 'LongReadLen' DBD::Oracle will return a 'ORA-24345: A Truncation' error.  To stop this set the database handle's 'LongTruncOk' attribute to '1'.
+There are no special settings, simply set the database handle's 'LongReadLen' attribute to a value that will be larger than the expected size of the LONG or LONG RAW.
+If the size of the LONG or LONG RAW exceeds 'LongReadLen' DBD::Oracle will return an 'ORA-24345: A Truncation' error.  To stop this set the database handle's 'LongTruncOk' attribute to '1'.
 The maximum value of 'LongReadLen' seems to be dependent on the physical memory limits of the box that Oracle is running on.  You have most likely reached this limit if you run into
 an 'ORA-01062: unable to allocate memory for define buffer' error.  One solution is to set the size of 'LongReadLen' to a lower value.
 
@@ -3959,13 +3959,13 @@ In the case above the query Got 28 characters (well really only 20 characters of
 
 =head3 Simple Fetch for CLOBs and BLOBs
 
-To use this interface for CLOBs and LOBs datatypes set the 'ora_pers_lob' attribute of the statement handle to '1' with the prepare method, as well
-set the database handle's 'LongReadLen' attribute to a value that will be the larger than the expected size of the LOB. If the size of the LOB exceeds
-the 'LongReadLen' DBD::Oracle will return a 'ORA-24345: A Truncation' error.  To stop this set the database handle's 'LongTruncOk' attribute to '1'.
+To use this interface for the CLOB and BLOB datatypes set the 'ora_pers_lob' attribute of the statement handle to '1' with the prepare method, and
+set the database handle's 'LongReadLen' attribute to a value that will be larger than the expected size of the LOB. If the size of the LOB exceeds
+'LongReadLen' DBD::Oracle will return an 'ORA-24345: A Truncation' error.  To stop this set the database handle's 'LongTruncOk' attribute to '1'.
 The maximum value of 'LongReadLen' seems to be dependent on the physical memory limits of the box that Oracle is running on in the same way that LONGs and LONG RAWs are.
 
-For CLOBs and NCLOBs the limit is 64k chars if there is no truncation, this is an internal OCI limit complain to them if you want it changed.  However if you CLOB is longer than this
-and also larger than the 'LongReadLen' than the 'LongReadLen' in chars is returned.
+For CLOBs and NCLOBs the limit is 64k chars if there is no truncation. This is an internal OCI limit--complain to them if you want it changed.  However if your CLOB is longer than this
+and also larger than 'LongReadLen' then 'LongReadLen' chars are returned.
 
 It seems with BLOBs you are not limited by the 64k.
 
@@ -4001,9 +4001,9 @@ before the execute will return all the lobs but they will be truncated at 2MBs.
 
 With a piecewise callback fetch DBD::Oracle sets up a function that will 'callback' to the DB during the fetch and gets your LOB (LONG, LONG RAW, CLOB, BLOB) piece by piece.
 To use this interface set the 'ora_clbk_lob' attribute of the statement handle to '1' with the prepare method. Next set the 'ora_piece_size' to the size of the piece that
-you want to return on the callback. Finally set the database handle's 'LongReadLen' attribute to a value that will be the larger than the expected
-size of the LOB. Like the L</Simple Fetch for LONGs and LONG RAWs> and L</Simple Fetch for CLOBs and BLOBs> the if the size of the LOB exceeds the is 'LongReadLen' you can use the 'LongTruncOk' attribute to truncate the LOB
-or set the 'LongReadLen' to a higher value.  With this interface the value of 'ora_piece_size' seems to be constrained by the same memory limit as found on
+you want to return on the callback. Finally set the database handle's 'LongReadLen' attribute to a value that will be larger than the expected
+size of the LOB. Like the L</Simple Fetch for LONGs and LONG RAWs> and L</Simple Fetch for CLOBs and BLOBs> the if the size of the LOB exceeds 'LongReadLen' you can use the 'LongTruncOk' attribute to truncate the LOB
+or set 'LongReadLen' to a higher value.  With this interface the value of 'ora_piece_size' seems to be constrained by the same memory limit as found on
 the Simple Fetch interface. If you encounter an 'ORA-01062' error try setting the value of 'ora_piece_size' to a smaller value.   The value for 'LongReadLen' is
 dependent on the version and settings of the Oracle DB you are using. In theory it ranges from 8GBs
 in 9iR1 up to 128 terabytes with 11g but you will also be limited by the physical memory of your PERL instance.
@@ -4043,9 +4043,9 @@ maximum of 4 pieces (4*5MB=20MB). Like the other examples long1 fields longer th
 
 With a polling piecewise fetch DBD::Oracle iterates (Polls) over the LOB during the fetch getting your LOB (LONG, LONG RAW, CLOB, BLOB) piece by piece. To use this interface set the 'ora_piece_lob'
 attribute of the statement handle to '1' with the prepare method. Next set the 'ora_piece_size' to the size of the piece that
-you want to return on the callback. Finally set the database handle's 'LongReadLen' attribute to a value that will be the larger than the expected
-size of the LOB. Like the L</Piecewise Fetch with Callback> and Simple Fetches if the size of the LOB exceeds the is 'LongReadLen' you can use the 'LongTruncOk' attribute to truncate the LOB
-or set the 'LongReadLen' to a higher value.  With this interface the value of 'ora_piece_size' seems to be constrained by the same memory limit as found on
+you want to return on the callback. Finally set the database handle's 'LongReadLen' attribute to a value that will be larger than the expected
+size of the LOB. Like the L</Piecewise Fetch with Callback> and Simple Fetches if the size of the LOB exceeds 'LongReadLen' you can use the 'LongTruncOk' attribute to truncate the LOB
+or set 'LongReadLen' to a higher value.  With this interface the value of 'ora_piece_size' seems to be constrained by the same memory limit as found on
 the L</Piecewise Fetch with Callback>.
 
 Using the table from the example above this code;
@@ -5381,7 +5381,7 @@ Most of these PL/SQL examples come from: Eric Bartley <bartley@cc.purdue.edu>.
   # What about the return value of a PLSQL function? Well treat it the same
   # as you would a call to a function from SQL*Plus. We add a placeholder
   # for the return value and bind it with a call to bind_param_inout so
-  # we can access it's value after execute.
+  # we can access its value after execute.
 
   my $whoami = "";
 

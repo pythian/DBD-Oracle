@@ -1063,7 +1063,7 @@ else
    }
 busy(0);
 
-# Display the formated info
+# Display the formatted info
 return(1);
 }
 

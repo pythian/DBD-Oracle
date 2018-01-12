@@ -130,7 +130,7 @@ print "\nExample 4\n";
 # What about the return value of a PL/SQL function? Well treat it the same
 # as you would a call to a function from SQL*Plus. We add a placeholder
 # for the return value and bind it with a call to bind_param_inout so
-# we can access it's value after execute.
+# we can access its value after execute.
 
 my $whoami = "";
 
