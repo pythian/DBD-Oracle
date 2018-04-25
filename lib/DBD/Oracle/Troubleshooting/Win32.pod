@@ -87,7 +87,7 @@ Windows platform having no Oracle or other development environment installed.
 
     12) Open a Windows Visual C++ command window from the start menu.
 
-    13) Add the path to the instant client to the Path command. If you are compiling aginst a 10XE db/client then you can skip steps 
+    13) Add the path to the instant client to the Path command. If you are compiling against a 10XE db/client then you can skip steps 
         12 to 14. 
         e.g.  PATH = C:/Oracle/instantclient;%PATH%
     
@@ -127,7 +127,7 @@ Windows platform having no Oracle or other development environment installed.
             iii. Attempt to log into the version of SQLPLUS that comes with Instantclient.  
                         If you manage to log on use the username password and TNS name with 
                         the Set ORACLE_USERID = and rerun the tests.
-                    iv   If you are compiling against 10XE and have skiped steps 12 to 14 try again bu this time carry out these steps
+                    iv   If you are compiling against 10XE and have skipped steps 12 to 14 try again bu this time carry out these steps
 
     20) You can now install DBD-Oracle into you system by entering the following command from the Visual C++ window dos prompt;
 

@@ -407,7 +407,7 @@ dbd_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *uid, char *pwd, S
 	if (DBD_ATTRIB_TRUE(attr,"ora_drcp",8,svp))
 		imp_dbh->using_drcp = 1;
 
-	/* some connection pool atributes  */
+	/* some connection pool attributes  */
 
 	if ((svp=DBD_ATTRIB_GET_SVP(attr, "ora_drcp_class", 14)) && SvOK(*svp)) {
 		STRLEN  svp_len;
@@ -2819,7 +2819,7 @@ pp_exec_rset(SV *sth, imp_sth_t *imp_sth, phs_t *phs, int pre_exec)
         {
             D_impdata(imp_sth_csr, imp_sth_t, sth_csr); /* TO_DO */
 
-            /* copy appropriate handles and atributes from parent statement	*/
+            /* copy appropriate handles and attributes from parent statement	*/
             imp_sth_csr->envhp		= imp_sth->envhp;
             imp_sth_csr->errhp		= imp_sth->errhp;
             imp_sth_csr->srvhp		= imp_sth->srvhp;

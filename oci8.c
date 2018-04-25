@@ -2564,7 +2564,7 @@ the concept is simple really
 	The the obj_ind is for the entier object not the properties so you call it once it
 	gets all of the indicators for the objects so you pass it into OCIObjectGetAttr and that
 	function will set attr_null_status as in the get below.
- 5. interate over the atributes of the object
+ 5. interate over the attributes of the object
 
 The thing to remember is that OCI and C have no way of representing a DB NULLs so we use the OCIInd find out
 if the object or any of its properties are NULL, This is one little line in a 20 chapter book and even then

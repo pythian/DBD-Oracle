@@ -145,7 +145,7 @@ Stephen de Vries
         ORACLE_USERID..
         ORACLE_SID ..
 
-    -Run make, all tests should be successfull -against Oracle 9.x at least.
+    -Run make, all tests should be successful -against Oracle 9.x at least.
 
     You should have no problems with Oracle 8.1.7, but accessing Oracle 7.x
     or previous is not possible (you'll core dump, or simply hang). The same

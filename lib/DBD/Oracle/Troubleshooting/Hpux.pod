@@ -190,7 +190,7 @@ Perl from source, the Configure program will ask you a series of
 questions about how to build Perl.  You may supply default answers to the
 questions when you invoke the Configure program by command line flags.
 
-We want to build a Perl that understands large files (over 2GB, wich is
+We want to build a Perl that understands large files (over 2GB, which is
 the default for building perl on HP-UX), and that is incompatible with
 v5.005 Perl scripts (compiling with v5.005 compatibility causes mod_perl
 to complain about malloc pollution).  At the command prompt type:
@@ -856,7 +856,7 @@ warnings;". However, it was annoying, since all my scripts had -w in the
 
 Since almost every OS now supports dynamic linking, I believe that static
 linking is NOT getting the same level of vetting it maybe used to.
-Dynamicly linking is what you get by default, so its way better tested.
+Dynamically linking is what you get by default, so its way better tested.
 
 =item 5 It's required for Apache and mod_perl.
 
