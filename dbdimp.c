@@ -1519,10 +1519,15 @@ phs_t *phs;
 		laststyle = style;
 		if (imp_sth->all_params_hv == NULL)
 			imp_sth->all_params_hv = newHV();
-		phs_sv = newSVpv((char*)&phs_tpl, sizeof(phs_tpl)+namelen+1);
-		phs = (phs_t*)(void*)SvPVX(phs_sv);
+		/* allocate and copy enough for phs_tpl */
+		phs_sv = newSVpvn((char*)&phs_tpl, sizeof(phs_tpl));
 		(void)hv_store(imp_sth->all_params_hv, start, namelen, phs_sv, 0);
-		phs->idx = idx-1;	   /* Will be 0 for :1, -1 for :foo. */
+		/* allocate extra room for the name (returns the PV) */
+		phs = (phs_t*)(void*)SvGROW(phs_sv, sizeof(phs_tpl)+namelen+1);
+		phs->idx = idx-1;          /* Will be 0 for :1, -1 for :foo. */
+		/* tell the SV the full length */
+		SvCUR_set(phs_sv, sizeof(phs_tpl)+namelen);
+		/* copy the name */
 		strcpy(phs->name, start);
 	}
 	*dest = '\0';
