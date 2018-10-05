@@ -979,6 +979,13 @@ sub find_oracle_home {
 	@oh = grep { (glob("$_/../lib*/libclntsh.$so*"))[0] } @path;
 	s:/[^/]/?$:: for @oh;
     }
+    if (!@oh && lc($^O) eq 'linux') { # Try the standard Linux RPM location
+   my @loh = glob("/usr/lib/oracle/*/*/lib/libclntsh.$so*");
+   sort { $a <=> $b } @loh;
+   my $loh = pop(@loh);
+   $loh =~ s/\/libclntsh.*$//g;
+   push(@oh,$loh);
+    }
     print "Found @oh\n" if @oh;
     return $oh[0];
 }
@@ -1690,6 +1697,9 @@ sub get_client_version {
 	}
 	elsif ( "$OH/" =~ m!/10g!) { # scary but handy
 	    $client_version_full = "10.0.0.0";
+	}
+	elsif ( "$OH/" =~ m!/usr/lib/oracle/(\d+\.\d)/!) { # Linux RPM
+	    $client_version_full = "$1.0.0";
 	}
     }
 
