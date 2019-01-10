@@ -4777,7 +4777,7 @@ static int enable_taf(
     imp_dbh_t *imp_dbh) {
 
     bool can_taf = 0;
-    sword status;
+    volatile sword status;
 
 #ifdef OCI_ATTR_TAF_ENABLED
     OCIAttrGet_log_stat(imp_dbh, imp_dbh->srvhp, OCI_HTYPE_SERVER, &can_taf, NULL,
