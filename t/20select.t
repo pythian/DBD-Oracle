@@ -102,7 +102,8 @@ is( join( ',', @pk ), 'DT,IDX', 'DT,IDX' );
 exit 0;
 
 END {
-    eval { drop_table($dbh) }
+    eval { drop_table($dbh) };
+    $dbh->disconnect if $dbh;
 }
 
 sub run_select_tests {
