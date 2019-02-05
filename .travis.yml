@@ -48,6 +48,23 @@ matrix:
         - ORACLE_USERID=kermit/foobar
         - ORACLE_USERID_2=mspiggy/barfoo
         - ORACLE_DSN='dbi:Oracle://localhost:1521/XE'
+
+    - perl: '5.26-thr'
+      env:
+        - ORACLEV=11.2
+        - ORACLEDBV=11.2
+        - ORACLE_USERID=kermit/foobar
+        - ORACLE_USERID_2=mspiggy/barfoo
+        - ORACLE_DSN='dbi:Oracle://localhost:1521/XE'
+
+    - perl: '5.26-thr'
+      env:
+        - ORACLEV=12.2
+        - ORACLEDBV=11.2
+        - ORACLE_USERID=kermit/foobar
+        - ORACLE_USERID_2=mspiggy/barfoo
+        - ORACLE_DSN='dbi:Oracle://localhost:1521/XE'
+
     - perl: '5.26-shrplib'
       env:
         - ORACLEV=11.2
