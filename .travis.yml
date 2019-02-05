@@ -33,7 +33,7 @@ matrix:
 
   include:
 
-    - perl: '5.24.3'
+    - perl: '5.26.1'
       env:
         - ORACLEV=12.2
         - ORACLEDBV=11.2
