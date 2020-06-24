@@ -3,7 +3,6 @@ language: perl
 # See https://docs.travis-ci.com/user/reference/overview/#Virtualisation-Environment-vs-Operating-System
 os: linux
 dist: trusty
-sudo: required
 
 env:
   global:
@@ -22,7 +21,7 @@ addons:
       - unzip
       - libaio1
 
-matrix:
+jobs:
   fast_finish: true
 
   allow_failures:
