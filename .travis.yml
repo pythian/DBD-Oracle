@@ -31,8 +31,8 @@ jobs:
 # FYI Oracle XE only comes in utf8, so we can't run USASCII version of tests
 
   include:
-# Perl 5.30 variations
-    - perl: '5.30'
+# Perl 5.32 variations
+    - perl: '5.32'
       env:
         - ORACLEV=11.2
         - ORACLEDBV=11.2
@@ -40,14 +40,14 @@ jobs:
         - ORACLE_USERID_2=mspiggy/barfoo
         - ORACLE_DSN='dbi:Oracle://localhost:1521/XE'
 
-    - perl: '5.30'
+    - perl: '5.32'
       env:
         - ORACLEV=12.2
         - ORACLEDBV=11.2
         - ORACLE_USERID=kermit/foobar
         - ORACLE_USERID_2=mspiggy/barfoo
         - ORACLE_DSN='dbi:Oracle://localhost:1521/XE'
-    - perl: '5.30-shrplib'
+    - perl: '5.32-shrplib'
       env:
         - ORACLEV=11.2
         - ORACLEDBV=11.2
@@ -55,7 +55,7 @@ jobs:
         - ORACLE_USERID_2=mspiggy/barfoo
         - ORACLE_DSN='dbi:Oracle://localhost:1521/XE'
 
-    - perl: '5.30-shrplib'
+    - perl: '5.32-shrplib'
       env:
         - ORACLEV=12.2
         - ORACLEDBV=11.2
