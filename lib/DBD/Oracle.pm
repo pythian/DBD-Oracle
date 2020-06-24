@@ -5582,27 +5582,10 @@ Also PL/Vision from RevealNet and Steven Feuerstein, and
 
 =back
 
-=head1 AUTHORS
-
-DBI by Tim Bunce L<http://www.tim.bunce.name>.
-
-The original C<DBD::Oracle> was by Tim Bunce.
-Maintained as of release 1.17 (February 2006) by John Scoles, then Yanick Champoux, under the
-auspice of the Pythian Group (L<http://www.pythian.com>).
-
 =head1 ACKNOWLEDGEMENTS
 
 A great many people have helped with DBD::Oracle over the 17 years
 between 1994 and 2011.  Far too many to name, but we thank them all.
 Many are named in the Changes file.
-
-=head1 COPYRIGHT
-
-The DBD::Oracle module is Copyright (c) 1994-2006 Tim Bunce. Ireland.
-The DBD::Oracle module is Copyright (c) 2006-2011 John Scoles (The Pythian Group). Canada.
-The DBD::Oracle module is Copyright (c) 2011 John Scoles. Canada.
-
-The DBD::Oracle module is free open source software; you can
-redistribute it and/or modify it under the same terms as Perl 5.
 
 =cut
