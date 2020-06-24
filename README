@@ -1,7 +1,7 @@
 
 DBD::Oracle  --  an Oracle interface for Perl 5.
 
-   Copyright (c) 1994-2006  Tim Bunce, Ireland.
+   Copyright (c) 1994-2020  Tim Bunce, et. al.
 
    See the COPYRIGHT section in the Oracle.pm file for terms.
    See also the MAINTAINER section in the Oracle.pm
@@ -266,30 +266,6 @@ README.login.txt    -- help for login problems
 README.longs.txt    -- examples dealing with LONG types (blobs)
 
 DBI 'home page': http://dbi.perl.org
-
-Old archive site for Perl DB information:
-    ftp://ftp.demon.co.uk/pub/perl/db/
-Mailing list archive:                /DBI/perldb-interest/
-Perl 4 Oraperl (v2.4)                /perl4/oraperl/
-
-Jeff Stander's stuff stands out for Oraperl:
-Directories of interest might be
-        /pub/Oracle/sources
-        /pub/Oracle/sources/jstander
-        /pub/Oracle/sources/jstander/distrib
-        /pub/Oracle/sources/jstander/tsmlib
-        /pub/Oracle/sources/jstander/wdbex
-        /pub/Oracle/sources/web/scripts
-        /pub/Oracle/sources/dba
-        /pub/Oracle/sources/dba/imp2sql7
-        /pub/Oracle/sources/Lonnroth
-        /pub/Oracle/sources/harrison
-
-http://www.bf.rmit.edu.au/~orafaq/perlish.html
-ftp://ftp.bf.rmit.edu.au/pub/perl/db
-ftp://ftp.bf.rmit.edu.au/pub/Oracle
-ftp://ftp.bf.rmit.edu.au/pub/Oracle/sources
-ftp://ftp.bf.rmit.edu.au/pub/Oracle/OS/MS/NT/ntoraperl.zip
 
 DBI and DBD::Oracle are very portable. If Perl and Oracle run on a platform
 then the chances are that DBD::Oracle will as well.
