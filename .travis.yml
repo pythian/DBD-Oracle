@@ -32,6 +32,38 @@ matrix:
 # FYI Oracle XE only comes in utf8, so we can't run USASCII version of tests
 
   include:
+# Perl 5.30 variations
+    - perl: '5.30'
+      env:
+        - ORACLEV=11.2
+        - ORACLEDBV=11.2
+        - ORACLE_USERID=kermit/foobar
+        - ORACLE_USERID_2=mspiggy/barfoo
+        - ORACLE_DSN='dbi:Oracle://localhost:1521/XE'
+
+    - perl: '5.30'
+      env:
+        - ORACLEV=12.2
+        - ORACLEDBV=11.2
+        - ORACLE_USERID=kermit/foobar
+        - ORACLE_USERID_2=mspiggy/barfoo
+        - ORACLE_DSN='dbi:Oracle://localhost:1521/XE'
+    - perl: '5.30-shrplib'
+      env:
+        - ORACLEV=11.2
+        - ORACLEDBV=11.2
+        - ORACLE_USERID=kermit/foobar
+        - ORACLE_USERID_2=mspiggy/barfoo
+        - ORACLE_DSN='dbi:Oracle://localhost:1521/XE'
+
+    - perl: '5.30-shrplib'
+      env:
+        - ORACLEV=12.2
+        - ORACLEDBV=11.2
+        - ORACLE_USERID=kermit/foobar
+        - ORACLE_USERID_2=mspiggy/barfoo
+        - ORACLE_DSN='dbi:Oracle://localhost:1521/XE'
+
 # Perl 5.28 variations
     - perl: '5.28'
       env:
