@@ -2,8 +2,8 @@
 
 set -ex
 
-# maybe in the future this will be more specific
-if [ -n "$ORACLEDBV" ]; then
+# 11.2
+if [ "$ORACLEDBV" = "11.2" ]; then
 
 # wget --content-disposition https://packagecloud.io/mojotech/cloud/packages/debian/jessie/oracle-xe_11.2.0-1.0_amd64.deb/download.deb
 
@@ -32,6 +32,10 @@ echo -e "pga_aggregate_target=200540160\nsga_target=601620480" >> /u01/app/oracl
 # Now configure Oracle XE
 printf 8080\\n1521\\nadminpass\\nadminpass\\ny\\n | /etc/init.d/oracle-xe configure
 
+# Replace the containers hostname with 0.0.0.0
+sed -i 's/'$(hostname)'/0.0.0.0/g' /u01/app/oracle/product/11.2.0/xe/network/admin/listener.ora
+sed -i 's/'$(hostname)'/0.0.0.0/g' /u01/app/oracle/product/11.2.0/xe/network/admin/tnsnames.ora
+
 sqlplusbin="/u01/app/oracle/product/11.2.0/xe/bin/sqlplus"
 # ORACLE_SID=XE ORACLE_HOME="/u01/app/oracle/product/11.2.0/xe" $sqlplusbin -H
 USER1=`echo $ORACLE_USERID|sed 's/\/.*//'`
@@ -52,5 +56,12 @@ ORACLE_SID=XE ORACLE_HOME="/u01/app/oracle/product/11.2.0/xe" $sqlplusbin -L -S 
 # ORACLE_SID=XE ORACLE_HOME="/u01/app/oracle/product/11.2.0/xe" $sqlplusbin -L -S SYSTEM/adminpass @/dev/stdin <<< "create database dbusasci character set US7ASCII national character set utf8 undo tablespace undotbs1 default temporary tablespace temp;"
 # ORACLE_SID=XE ORACLE_HOME="/u01/app/oracle/product/11.2.0/xe" $sqlplusbin -L -S SYSTEM/adminpass @/dev/stdin <<< "create database dbutf character set AL32UTF8 national character set AL16UTF16 undo tablespace undotbs1 default temporary tablespace temp;"
 
+
+fi
+
+
+if [ "$ORACLEDBV" = "18" ]; then
+
+echo "TODO See https://github.com/fuzziebrain/docker-oracle-xe/blob/master/Dockerfile"
 
 fi
