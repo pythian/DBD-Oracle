@@ -6,12 +6,10 @@ FROM perl:5.32-threaded-buster
 # build then run this throw away docker image with:
 # cd DBD-Oracle
 # docker build -f maint/Dockerfile  . -t testoracle
-# docker run -it testoracle bash
-# . /etc/profile.d/oracle.sh
+# docker run -it testoracle
 # perl Makefile.PL
 # make
-# /etc/init.d/oracle-xe start
-# prove -lbv t/
+# make test
 
 # Adjust the FROM line to pick a perl version and distro. See also https://hub.docker.com/_/perl
 # Adjust the two variables below to set the Oracle XE server version and client version
