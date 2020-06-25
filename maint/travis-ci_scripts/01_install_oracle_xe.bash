@@ -14,6 +14,7 @@ wget --quiet https://raw.githubusercontent.com/wnameless/docker-oracle-xe-11g/ma
 wget --quiet https://raw.githubusercontent.com/wnameless/docker-oracle-xe-11g/master/assets/oracle-xe_11.2.0-1.0_amd64.debab
 wget --quiet https://raw.githubusercontent.com/wnameless/docker-oracle-xe-11g/master/assets/oracle-xe_11.2.0-1.0_amd64.debac
 cat oracle-xe_11.2.0-1.0_amd64.deba* > oracle-xe_11.2.0-1.0_amd64.deb
+sha256sum oracle-xe_11.2.0-1.0_amd64.deb
 dpkg --install oracle-xe_11.2.0-1.0_amd64.deb
 
 # Hack needed because oracle configuration looks for awk in /bin instead of $PATH
