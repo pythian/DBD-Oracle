@@ -51,6 +51,7 @@ ub2 utf8_csid		= 871;
 ub2 al32utf8_csid	= 873;
 ub2 al16utf16_csid	= 2000;
 
+static int dbd_dr_destroy_called = 0;
 
 typedef struct sql_fbh_st sql_fbh_t;
 struct sql_fbh_st {
@@ -199,6 +200,7 @@ dbd_init(dbistate_t *dbistate)
 	dTHX;
 	DBIS = dbistate;
 	dbd_init_oci(dbistate);
+	dbd_dr_destroy_called = 0;
 }
 
 
@@ -207,6 +209,8 @@ dbd_dr_destroy(SV *drh, imp_drh_t *imp_drh)
 {
 	dTHX;
 	sword status;
+
+	dbd_dr_destroy_called = 1;
 
 	/* We rely on the DBI dispatcher to destroy all child handles before we get here (DBI >= 1.623). */
 
@@ -1167,6 +1171,11 @@ dbd_db_disconnect(SV *dbh, imp_dbh_t *imp_dbh)
 	/* since most errors imply already disconnected.	*/
 	DBIc_ACTIVE_off(imp_dbh);
 
+	/* If dbd_dr_destroy has been called, it's completely */
+	/* unsafe to do anything with the handle, so just return */
+	if (dbd_dr_destroy_called) {
+	  return 1;
+	}
 	/* Oracle will commit on an orderly disconnect.	*/
 	/* See DBI Driver.xst file for the DBI approach.	*/
 
