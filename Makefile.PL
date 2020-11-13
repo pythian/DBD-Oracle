@@ -1115,7 +1115,7 @@ sub read_sysliblist {
            $syslibs =~ s/\s*-lcl\b//g;
     }
     if (lc(@Config{qw(myuname)}) =~ /debian/) {
-        $syslibs .= " -lnnz12 -lons -lclntshcore -lipc1 -lmql1";
+        $syslibs .= " -Wl,--no-as-needed -lnnz12 -lons -lclntshcore -lipc1 -lmql1";
     }
     return $syslibs;
 }
