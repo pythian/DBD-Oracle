@@ -433,7 +433,7 @@ elsif (@libclntsh) {
 
     my $lib = "clntsh";
     $linkwith_msg = "-l$lib.";
-    $opts{LIBS} = [ "-L$OH -l$lib $syslibs" ];
+    $opts{LIBS} = [ "-L$OH -Wl,-rpath,$OH -l$lib $syslibs" ];
 
     my $inc = join " ", map { "-I$_" } find_headers();
     $opts{INC}  = "$inc -I$dbi_arch_dir";
